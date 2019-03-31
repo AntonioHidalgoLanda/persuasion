@@ -44,8 +44,9 @@ Inhabitant.prototype.isPathLevelGreater = function (path, level) {
 };
 
 Inhabitant.prototype.isRapportLevelGreater = function (inhabitantId, level) {
-    return ((level <= 0) || (this.rapport.hasOwnProperty(inhabitantId) && this.rapport[inhabitantId] >= level))
-}
+    "use strict";
+    return ((level <= 0) || (this.rapport.hasOwnProperty(inhabitantId) && this.rapport[inhabitantId] >= level));
+};
 
 Inhabitant.prototype.increasePathLevel = function (path, increase) {
     "use strict";
