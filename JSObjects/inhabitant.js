@@ -37,33 +37,57 @@ Inhabitant.createLeader = function (id, time, energy, cash) {
 };
 
 // TODO - Multi Path action
-// TODO - refactor rule using extracting methos into Inhabitant
+
+Inhabitant.prototype.isPathLevelGreater = function (path, level) {
+    "use strict";
+    return ((level <= 0) || (this.pathLikehood.hasOwnProperty(path) && this.pathLikehood[path] >= level));
+};
+
+Inhabitant.prototype.isRapportLevelGreater = function (inhabitantId, level) {
+    return ((level <= 0) || (this.rapport.hasOwnProperty(inhabitantId) && this.rapport[inhabitantId] >= level))
+}
+
+Inhabitant.prototype.increasePathLevel = function (path, increase) {
+    "use strict";
+    if (this.pathLikehood.hasOwnProperty(path)) {
+        this.pathLikehood[path] += increase;
+    } else {
+        this.pathLikehood[path] = increase;
+    }
+    return this;
+};
+
+Inhabitant.prototype.increaseRapport = function (inhabitantId, increase) {
+    "use strict";
+    if (this.rapport.hasOwnProperty(inhabitantId)) {
+        this.rapport[inhabitantId] += increase;
+    } else {
+        this.rapport[inhabitantId] = increase;
+    }
+    return this;
+};
+
 
 var condition = "(L.energy >= action.cost) && " +
-    " ((action.levelTrust === 0) || " +
-    " (T.rapport.hasOwnProperty(L.id) && T.rapport[L.id] >= action.levelTrust))" +
-    " && ((action.levelSkill === 0 )" +
-    " || (T.pathLikehood.hasOwnProperty(action.path) && T.pathLikehood[action.path] >= action.levelSkill)" +
-    " || (L.pathLikehood.hasOwnProperty(action.path) && L.pathLikehood[action.path] >= action.levelSkill))";
+    " T.isRapportLevelGreater(L.id, action.levelTrust)" +
+    " && (T.isPathLevelGreater(action.path, action.levelSkill)" +
+    " || L.isPathLevelGreater(action.path, action.levelSkill))";
 
 // Common
 var reaction = "L.energy -= action.cost;" +
-        " T.rapport[L.id] = T.rapport.hasOwnProperty(L.id)?T.rapport[L.id]:0;" +
-        " T.pathLikehood[action.path] = T.pathLikehood.hasOwnProperty(action.path)?T.pathLikehood[action.path]:0;" +
-        " L.pathLikehood[action.path] = L.pathLikehood.hasOwnProperty(action.path)?L.pathLikehood[action.path]:0;" +
         " L.time += 1;";
         
 // Neg
 reaction += " T.selfvalue[L.id] = (!T.selfvalue.hasOwnProperty(L.id))?" +
         "100:Math.max(0, T.selfvalue[L.id] - (action.neg*0.5));" +
-        " T.rapport[L.id] += (T.selfvalue[L.id] > 0)? action.neg:0;";
+        " T.increaseRapport(L.id, (T.selfvalue[L.id] > 0)? action.neg:0);";
             
 // Illustrate
-reaction += " T.pathLikehood[action.path] += action.illustrate;" +
-        " L.pathLikehood[action.path] += action.illustrate * 0.1;";
+reaction += " T.increasePathLevel(action.path, action.illustrate);" +
+        " L.increasePathLevel(action.path, action.illustrate * 0.1);";
 
 // Entretain
-reaction += " T.rapport[L.id] += action.entretain;";
+reaction += " T.increaseRapport(L.id, action.entretain);";
 
 Inhabitant.ruleSet = {
     "persuade": new Rule(condition, reaction)
