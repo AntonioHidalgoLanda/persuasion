@@ -59,15 +59,15 @@ Room.prototype.dreamNeighbours = function () {
     "use strict";
     var totalRooms = Math.floor(Math.random() * Room.DREAMING_NEIGHBOURGS) + 1; 
     if (this.entrance.length === 0) {
-        var neighnours = this.getNeighbours(Room.DREAMING_NEIGHBOURGS_DEPTH);
+        var neighbours = this.getNeighbours(Room.DREAMING_NEIGHBOURGS_DEPTH);
         for (var i = 0; i < totalRooms; i++){
             var newroom = Math.random() * Room.DREAMING_NEIGHBOURGS;
-            if (neighnours[0].length >= newroom) {
-                this.entrance.push(neighnours[0][Math.floor(newroom)]);
-            } else if (neighnours[1].length >= newroom) {
-                this.entrance.push(neighnours[1][Math.floor(newroom)]);
-            } else if (neighnours[2].length >= newroom) {
-                this.entrance.push(neighnours[2][Math.floor(newroom)]);
+            if (neighbours[0].length >= newroom) {
+                this.entrance.push(neighbours[0][Math.floor(newroom)]);
+            } else if (neighbours[1].length >= newroom) {
+                this.entrance.push(neighbours[1][Math.floor(newroom)]);
+            } else if (neighbours[2].length >= newroom) {
+                this.entrance.push(neighbours[2][Math.floor(newroom)]);
             } else {
                 this.entrance.push(new Room());
             }
