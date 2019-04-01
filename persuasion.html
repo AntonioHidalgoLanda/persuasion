@@ -20,6 +20,7 @@ and open the template in the editor.
         <!-- JS Objects -->
         <script type="text/javascript" src="JSObjects/inhabitant.js"></script>
         <script type="text/javascript" src="JSObjects/action.js"></script>
+        <script type="text/javascript" src="JSObjects/room.js"></script>
         <!-- View -->
         <script type="text/javascript" src="JSView/baseView.js"></script>
     </head>
@@ -28,6 +29,9 @@ and open the template in the editor.
         <div id="gui-rules-div">
         </div>
         <div id="gui-rule-div">
+            Loading...
+        </div>
+        <div id="gui-room-div">
             Loading...
         </div>
         
@@ -59,10 +63,21 @@ and open the template in the editor.
         fact.RS0_inhabitant_001.header = "Unknown";
         fact.RS0_inhabitant_001.imageUri = "img/avatar1.png";
         
+        var room = new Room();
+        room.header = "Generic Room";
+        room.dreamNeighbouhood();
+        console.log("nodes");
+        console.log(Room.nodes);
+        console.log("links");
+        console.log(Room.links);
+        
         var guiFacts = new FactsGUI(fact, jQuery("#gui-rule-div"));
         
-        var view = new BaseView("gui-rules-div", fact.RS0_mainchar_000, actions);
-        view.setViewee(fact.RS0_inhabitant_001);
+        var viewInhabitant = new BaseView("gui-rules-div", fact.RS0_mainchar_000, actions);
+        viewInhabitant.setViewee(fact.RS0_inhabitant_001);
+        
+        var viewRoom = new BaseView("gui-room-div", fact.RS0_mainchar_000, actions);
+        viewRoom.setViewee(room);
         
     </script>
 </html>

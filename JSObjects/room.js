@@ -83,7 +83,7 @@ Room.prototype.setEntrance = function (room) {
 Room.prototype.dreamNeighbours = function () {
     "use strict";
     var totalRooms = Math.floor(Math.random() * Room.DREAMING_NEIGHBOURGS) + 1;
-    if (Object.keys(this.entrance).length === 0) {
+    if (Object.keys(this.entrance).length <= 1) {
         var neighbours = this.getNeighbours(Room.DREAMING_NEIGHBOURGS_DEPTH);
         for (var i = 0; i < totalRooms; i++){
             var newroom = Math.random() * Room.DREAMING_NEIGHBOURGS;
@@ -101,6 +101,13 @@ Room.prototype.dreamNeighbours = function () {
     return this;
 }
 
+Room.prototype.dreamNeighbouhood = function () {
+    this.dreamNeighbours();
+    for (var roomId in this.entrance) {
+        this.entrance[roomId].dreamNeighbours();
+    }
+    return this;
+};
 
 // resume()
 
