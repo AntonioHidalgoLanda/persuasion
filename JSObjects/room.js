@@ -2,7 +2,7 @@
 function Room(id) {
     "use strict";
     this.id = (id === undefined || id === null) ? "room_" + Math.floor(Math.random() * (1000 - 1)) : id;
-    this.entrance = [];
+    this.entrance = {};
     this.works = {}; // actions
     this.inhabitants = {};
 //    this.pathentryLevel = {}; // to fileter who can access to the room with go to
@@ -12,6 +12,9 @@ function Room(id) {
 
 Room.DREAMING_NEIGHBOURGS = 2.9;
 Room.DREAMING_NEIGHBOURGS_DEPTH = 3;
+
+Room.nodes = {};
+Room.links = {};
 
 // TODO
 // create()
@@ -47,29 +50,51 @@ Room.prototype.getNeighbours = function (deep) {
     return neighbours;
 };
 
-Room.prototype.setEntrances = function (rooms) {
+Room.prototype.setEntrance = function (room) {
     "use strict";
-    if (rooms !== undefined) {
-        this.entrance = rooms.slice();
+    if (!Room.nodes.hasOwnProperty(room.id)) {
+        Room.nodes[room.id] = room;
     }
+    if (!Room.nodes.hasOwnProperty(this.id)) {
+        Room.nodes[this.id] = this;
+    }
+    if (!Room.links.hasOwnProperty(this.id)) {
+        Room.links[this.id] = {};
+    }
+    if (!Room.links[this.id].hasOwnProperty(room.id)) {
+        Room.links[this.id][room.id] = room.id;
+    }
+    if (!Room.links.hasOwnProperty(room.id)) {
+        Room.links[room.id] = {};
+    }
+    if (!Room.links[room.id].hasOwnProperty(this.id)) {
+        Room.links[room.id][this.id] = this.id;
+    }
+    if (!this.entrance.hasOwnProperty(room.id)) {
+        this.entrance[room.id] = room;
+    }
+    if (!room.entrance.hasOwnProperty(this.id)) {
+        room.entrance[this.id] = this;
+    }
+    
     return this;
 };
 
 Room.prototype.dreamNeighbours = function () {
     "use strict";
-    var totalRooms = Math.floor(Math.random() * Room.DREAMING_NEIGHBOURGS) + 1; 
-    if (this.entrance.length === 0) {
+    var totalRooms = Math.floor(Math.random() * Room.DREAMING_NEIGHBOURGS) + 1;
+    if (Object.keys(this.entrance).length === 0) {
         var neighbours = this.getNeighbours(Room.DREAMING_NEIGHBOURGS_DEPTH);
         for (var i = 0; i < totalRooms; i++){
             var newroom = Math.random() * Room.DREAMING_NEIGHBOURGS;
             if (neighbours[0].length >= newroom) {
-                this.entrance.push(neighbours[0][Math.floor(newroom)]);
+                this.setEntrance(neighbours[0][Math.floor(newroom)]);
             } else if (neighbours[1].length >= newroom) {
-                this.entrance.push(neighbours[1][Math.floor(newroom)]);
+                this.setEntrance(neighbours[1][Math.floor(newroom)]);
             } else if (neighbours[2].length >= newroom) {
-                this.entrance.push(neighbours[2][Math.floor(newroom)]);
+                this.setEntrance(neighbours[2][Math.floor(newroom)]);
             } else {
-                this.entrance.push(new Room());
+                this.setEntrance(new Room());
             }
         }
     }
@@ -79,17 +104,30 @@ Room.prototype.dreamNeighbours = function () {
 
 // resume()
 
+/*
+format
+{
+    "nodes":[
+        {"name":room.getName(),"group":1}
+    ],
+    "links":[
+        {"source":index(room.getName()),"target":index(),"weight":1}
+    ]
+}
+*/
 // getD3Map()
 
 /*
 Room.ruleSet = {
-    "go": new Rule(condition, reaction),
-    "work": new Rule(condition, reaction)
+    "go": new Rule(condition, reaction),    <inhabitant, room>
+    "work": new Rule(condition, reaction)   <inhabitant, room, action>  e.g. rest, manufacture
+    "work": new Rule(condition, reaction)   <inhabitant, inhabitant, room, action> e.g. customer_engagement
 };
 */
+Room.ruleSet = {};
 var condition = "L.pathLikehood[R.pathEntry] >= D.pathEntryLevel[R.pathEntry]";
 var reaction = "D.inhabitants[L.id] = L; S.inhabitants[L.id] = null;";
-Room.ruleSet.go = new Rule(condition, reaction);
+//Room.ruleSet.go = new Rule(condition, reaction);
 
 Room.prototype.getRules = function () {
     'use strict';
