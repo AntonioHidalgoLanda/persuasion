@@ -106,10 +106,18 @@ BaseView.prototype.refreshHeader = function () {
     return this;
 };
 
+
 BaseView.prototype.refreshPicture = function () {
     "use strict";
     var divId = BaseView.DIV_ELEMENT_ID.PIC_DIV + "_" + this.divId,
-        imageUri = (this.viewee !== null && this.viewee.hasOwnProperty("imageUri")) ? this.viewee.imageUri : "";
+        imageUri = "";
+    if (this.viewee !== null) {
+        if (typeof this.viewee.getImageUri === "function") {
+            imageUri = this.viewee.getImageUri();
+        } else if (this.viewee.hasOwnProperty("imageUri")) {
+            imageUri = this.viewee.imageUri;
+        }
+    }
 
     if (this.divId === null) {
         return this;
@@ -153,7 +161,6 @@ BaseView.prototype.refreshDescription = function () {
     return this;
 };
 
-// TODO
 BaseView.prototype.refreshInhabitants = function () {
     "use strict";
     var divId = BaseView.DIV_ELEMENT_ID.INHABITANTS_DIV + "_" + this.divId,
