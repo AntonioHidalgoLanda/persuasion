@@ -1,4 +1,5 @@
 /*global jQuery, Rule*/
+/*global showMap*//*from JSView/mapView - we may create them as a class later*/
 function BaseView(divId, inhabitant, actions) {
     "use strict";
     this.viewee = null;
@@ -85,8 +86,15 @@ BaseView.prototype.emptyDiv = function (div, divId) {
 BaseView.prototype.refreshHeader = function () {
     "use strict";
     var divId = BaseView.DIV_ELEMENT_ID.HEADER_DIV + "_" + this.divId,
-        content = (this.viewee !== null && this.viewee.hasOwnProperty("header")) ? this.viewee.header : "";
+        content = "";
     
+    if (this.viewee !== null) {
+        if (typeof this.viewee.getName === "function") {
+            content = this.viewee.getName();
+        } else if (this.viewee.hasOwnProperty("name")) {
+            content = this.viewee.name;
+        }
+    }
     this.emptyDiv("headerDiv", divId);
     
     if (this.headerDiv !== null) {
@@ -138,6 +146,10 @@ BaseView.prototype.refreshDescription = function () {
         this.descriptionDiv.text(content);
     }
     
+    if (this.viewee && typeof this.viewee.getD3SjonMap === "function") {
+        showMap (this.viewee.getD3SjonMap(), divId);
+    }
+    
     return this;
 };
 
@@ -148,6 +160,7 @@ BaseView.prototype.refreshInhabitants = function () {
         inhabitants = null;
     if (this.viewee !== null && this.viewee.hasOwnProperty("inhabitants")) {
         console.log(" refreshInhabitants " + divId + inhabitants);
+        // TODO links buttong to make them the view (option in viewee to go back to the room view if you are a inhabitant )
     }
     return this;
 };

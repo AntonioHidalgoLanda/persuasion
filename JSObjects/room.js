@@ -16,38 +16,9 @@ Room.DREAMING_NEIGHBOURGS_DEPTH = 3;
 Room.nodes = {};
 Room.links = {};
 
-// TODO
-// create()
-Room.prototype.getNeighbours = function (deep) {
+Room.prototype.getName = function () {
     "use strict";
-    var neighbours = [],
-        level = 0;
-    neighbours[level] = [];
-    for (var neighbour in this.entrance) {
-        neighbours[level].push(this.entrance[neighbour]);
-    }
-    if (deep !== undefined) {
-        while (deep-- > 0) {
-            level++;
-            neighbours[level] = [];
-            for (neighbour in neighbours[level - 1]) {
-                var rooms = neighbours[level - 1][neighbour].getNeighbours();
-                for (var roomNumber in rooms[0]) {
-                    var room = rooms[0][roomNumber];
-                    var newneighbour = true;
-                    for (var i = 0; i < level; i++) {
-                        if (room in neighbours[level]) {
-                            newneighbour = false;
-                        }
-                    }
-                    if (newneighbour){
-                        neighbours[level].push(room);
-                    }
-                }
-            }
-        }
-    }
-    return neighbours;
+    return (this.hasOwnProperty("textName")) ? this.textName : this.id;
 };
 
 Room.prototype.setEntrance = function (room) {
@@ -80,6 +51,38 @@ Room.prototype.setEntrance = function (room) {
     return this;
 };
 
+Room.prototype.getNeighbours = function (deep) {
+    "use strict";
+    var neighbours = [],
+        level = 0;
+    neighbours[level] = [];
+    for (var neighbour in this.entrance) {
+        neighbours[level].push(this.entrance[neighbour]);
+    }
+    if (deep !== undefined) {
+        while (deep-- > 0) {
+            level++;
+            neighbours[level] = [];
+            for (neighbour in neighbours[level - 1]) {
+                var rooms = neighbours[level - 1][neighbour].getNeighbours();
+                for (var roomNumber in rooms[0]) {
+                    var room = rooms[0][roomNumber];
+                    var newneighbour = true;
+                    for (var i = 0; i < level; i++) {
+                        if (room in neighbours[level]) {
+                            newneighbour = false;
+                        }
+                    }
+                    if (newneighbour){
+                        neighbours[level].push(room);
+                    }
+                }
+            }
+        }
+    }
+    return neighbours;
+};
+
 Room.prototype.dreamNeighbours = function () {
     "use strict";
     var totalRooms = Math.floor(Math.random() * Room.DREAMING_NEIGHBOURGS) + 1;
@@ -109,20 +112,48 @@ Room.prototype.dreamNeighbouhood = function () {
     return this;
 };
 
-// resume()
 
 /*
 format
-{
-    "nodes":[
-        {"name":room.getName(),"group":1}
-    ],
-    "links":[
-        {"source":index(room.getName()),"target":index(),"weight":1}
-    ]
-}
+var jsonmap = {
+    "nodes": [
+		{"name": "node1", "group": 1},
+		{"name": "node2", "group": 2},
+		{"name": "node3", "group": 2},
+		{"name": "node4", "group": 3}
+	],
+	"links": [
+		{"source": 2, "target": 1, "weight": 1},
+		{"source": 0, "target": 2, "weight": 3}
+	]
+};
 */
-// getD3Map()
+Room.prototype.getD3SjonMap = function () {
+    'use strict';
+    var i = 0;
+    var reverseNode = {};
+    var jsonMap = {
+        "nodes": [],
+        "links": []
+    };
+    
+    for (var nodeid in Room.nodes) {
+        var node = Room.nodes[nodeid];
+        jsonMap.nodes[i] = {"name": node.getName(), "occupants": Object.keys(node.inhabitants).length, "current": (this === node)};
+        reverseNode[nodeid] = i++;
+    }
+    for (var sourceid in Room.links) {
+        var targets = Room.links[sourceid];
+        for (var targetid in targets) {
+            jsonMap.links.push ({
+                "source": reverseNode[sourceid],
+                "target": reverseNode[targetid],
+                "weight": 1
+            });
+        }
+    }
+    return jsonMap;
+};
 
 /*
 Room.ruleSet = {

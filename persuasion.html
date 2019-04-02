@@ -9,9 +9,12 @@ and open the template in the editor.
         <title>Machine Dream</title>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <!-- Styles -->
+        <link rel="stylesheet" type="text/css" href="/styles/map.css">
         <!--<link rel="stylesheet" type="text/css" href="/DreamingMachine/css/basic.css">-->
         <!-- Libraries-->
         <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+        <script src="http://d3js.org/d3.v2.min.js?2.9.3"></script>
         <!-- Core Components -->
         <script type="text/javascript" src="https://cdn.jsdelivr.net/gh/AntonioHidalgoLanda/jssimpleruleengine@master/JSObjects/rule.js"></script>
         <script type="text/javascript" src="https://cdn.jsdelivr.net/gh/AntonioHidalgoLanda/jssimpleruleengine@master/JSObjects/guiFacts.js"></script>
@@ -23,6 +26,7 @@ and open the template in the editor.
         <script type="text/javascript" src="JSObjects/room.js"></script>
         <!-- View -->
         <script type="text/javascript" src="JSView/baseView.js"></script>
+        <script type="text/javascript" src="JSView/mapView.js"></script>
     </head>
     <body>
         <a href="/pickuatest.html">link</a>
@@ -32,6 +36,9 @@ and open the template in the editor.
             Loading...
         </div>
         <div id="gui-room-div">
+            Loading...
+        </div>
+        <div id="gui-map-div">
             Loading...
         </div>
         
@@ -45,6 +52,7 @@ and open the template in the editor.
             };
         }
         
+        // Entities
         var actions = {};
         var fact = {};
         fact.RS0_mainchar_000 = Inhabitant.createLeader();
@@ -52,25 +60,29 @@ and open the template in the editor.
         fact.RS0_inhabitant_000 = new Inhabitant();
         fact.RS0_inhabitant_001 = new Inhabitant();
 
-        fact.RS0_action_000B = new Action("money");
+        fact.RS0_action_000B = new Action("followers");
         actions.RS0_action_000B = fact.RS0_action_000B;
-        fact.RS0_action_000O = new Action("money",0);
+        fact.RS0_action_000O = new Action("followers",0);
         actions.RS0_action_000O = fact.RS0_action_000O;
-        fact.RS0_action_001O = new Action("money", 0, 0);
+        fact.RS0_action_001O = new Action("followers", 0, 0);
         actions.RS0_action_001O = fact.RS0_action_001O;
         
         
-        fact.RS0_inhabitant_001.header = "Unknown";
+        fact.RS0_inhabitant_001.name = "Unknown Person";
         fact.RS0_inhabitant_001.imageUri = "img/avatar1.png";
         
         var room = new Room();
-        room.header = "Generic Room";
+        room.textName = "Generic Room";
         room.dreamNeighbouhood();
+        room.inhabitants = Object.assign({}, fact);
+/*
         console.log("nodes");
         console.log(Room.nodes);
         console.log("links");
         console.log(Room.links);
+*/
         
+        // Visualization
         var guiFacts = new FactsGUI(fact, jQuery("#gui-rule-div"));
         
         var viewInhabitant = new BaseView("gui-rules-div", fact.RS0_mainchar_000, actions);
@@ -78,6 +90,7 @@ and open the template in the editor.
         
         var viewRoom = new BaseView("gui-room-div", fact.RS0_mainchar_000, actions);
         viewRoom.setViewee(room);
+        
         
     </script>
 </html>
