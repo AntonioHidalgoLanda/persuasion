@@ -22,6 +22,12 @@ Inhabitant.prototype.getName = function () {
     return (this.hasOwnProperty("textName")) ? this.textName : this.id;
 };
 
+
+Inhabitant.prototype.getRules = function () {
+    'use strict';
+    return Inhabitant.ruleSet;
+};
+
 Inhabitant.createLeader = function (id, time, energy, cash) {
     "use strict";
     var inhabitant = new Inhabitant(id);
@@ -73,6 +79,23 @@ Inhabitant.prototype.increaseRapport = function (inhabitantId, increase) {
     return this;
 };
 
+Inhabitant.prototype.getCandidatesRuleLeadActions = function (rule, lead, actions) {
+    "use strict";
+    var candidates = [];
+    for (var actionName in actions) {
+        var action = actions[actionName];
+        var candidate = {
+            "action": action,
+            "L": lead,
+            "T": this,
+            "Math": Math
+        };
+        if (rule.isValidCandidate(candidate)) {
+            candidates.push(candidate);
+        }
+    }
+    return candidates;
+};
 
 var condition = "(L.energy >= action.cost) && " +
     " T.isRapportLevelGreater(L.id, action.levelTrust)" +
@@ -113,10 +136,5 @@ Inhabitant.prototype.description = function () {
         }
         return val;
     });
-};
-
-Inhabitant.prototype.getRules = function () {
-    'use strict';
-    return Inhabitant.ruleSet;
 };
 

@@ -177,10 +177,10 @@ BaseView.prototype.refreshInhabitants = function () {
             }));
         }
     }
-    if (this.viewee && this.viewee.currentRoom !== null && this.viewee.currentRoom !== undefined) {
+    if (this.inhabitant && this.inhabitant.currentRoom !== null && this.inhabitant.currentRoom !== undefined) {
         this.inhabitantsDiv.append(jQuery('<button/>', {
-            text: "Check " + this.viewee.currentRoom.getName(),
-            click: this.handerChangeViewee(this.viewee.currentRoom)
+            text: "Check " + this.inhabitant.currentRoom.getName(),
+            click: this.handerChangeViewee(this.inhabitant.currentRoom)
         }));
     }
     return this;
@@ -189,7 +189,8 @@ BaseView.prototype.refreshInhabitants = function () {
 BaseView.prototype.refreshRules = function () {
     "use strict";
     var divId = BaseView.DIV_ELEMENT_ID.RULES_DIV + "_" + this.divId,
-        ruleSet = {};
+        ruleSet = {},
+        candidates;
     
     this.emptyDiv("rulesDiv", divId);
     
@@ -203,13 +204,16 @@ BaseView.prototype.refreshRules = function () {
     
     for (var ruleName in ruleSet) {
         var rule = ruleSet[ruleName];
-console.log("RULE:   " + ruleName);
-        var candidates = this.candidatesForVieweeALT(rule);
-                                                              
+        if (this.viewee !== null && typeof this.viewee.getCandidatesRuleLeadActions === "function") {
+            candidates = this.viewee.getCandidatesRuleLeadActions(rule, this.inhabitant, this.actions);
+        } else {
+            candidates = {};
+        }
+        
         for (var n in candidates) {
             var candidate = candidates[n];
             this.rulesDiv.append(jQuery('<button/>', {
-                text: ruleName + ": " + candidate.action.path + " " + candidate.action.levelSkill,
+                text: ruleName + " " + BaseView.candidateName(candidate),
                 click: this.handerExecuteCandidate(candidate, rule)
             }));
         }
@@ -217,23 +221,17 @@ console.log("RULE:   " + ruleName);
     return this;
 };
 
-BaseView.prototype.candidatesForVieweeALT = function (rule) {
+BaseView.candidateName = function (candidate) {
     "use strict";
-    var candidates = [];
-    for (var actionName in this.actions) {
-        var action = this.actions[actionName];
-        var candidate = {
-            "action": action,
-            "L": this.inhabitant,
-            "T": this.viewee,
-            "Math": Math
-        };
-        if (rule.isValidCandidate(candidate)) {
-            candidates.push(candidate);
+    var name = "";
+    for (var target in candidate) {
+        if(typeof candidate[target].getName === "function") {
+            name += ", " + candidate[target].getName();
+        } else if (candidate[target].hasOwnProperty("id")) {
+            name += ", " + candidate[target].id;
         }
     }
-    
-    return candidates;
+    return name;
 };
 
 BaseView.prototype.handerExecuteCandidate = function (candidate, rule) {

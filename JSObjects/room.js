@@ -117,7 +117,7 @@ Room.prototype.dreamNeighbouhood = function () {
 Room.prototype.enter = function (inhabitant) {
     "use strict";
     if (inhabitant.hasOwnProperty("currentRoom")) {
-        inhabitant.currentRoom.inhabitants[inhabitant.id] = null;
+        delete inhabitant.currentRoom.inhabitants[inhabitant.id];
     }
     inhabitant.currentRoom = this;
     this.inhabitants[inhabitant.id] = inhabitant;
@@ -163,6 +163,7 @@ Room.prototype.getD3SjonMap = function () {
     return jsonMap;
 };
 
+/* Rule Management*/
 /*
 Room.ruleSet = {
     "go": new Rule(condition, reaction),    <inhabitant, room>
@@ -171,11 +172,29 @@ Room.ruleSet = {
 };
 */
 Room.ruleSet = {};
-var condition = "L.pathLikehood[D.pathEntry] >= D.pathEntryLevel";
+var condition = "D.pathEntryLevel ===0 || L.pathLikehood[D.pathEntry] >= D.pathEntryLevel";
 var reaction = "D.enter(L)";
 Room.ruleSet.go = new Rule(condition, reaction);
 
 Room.prototype.getRules = function () {
     'use strict';
     return Room.ruleSet;
+};
+
+Room.prototype.getCandidatesRuleLeadActions = function (rule, lead, actions) {
+    "use strict";
+    var candidates = [];
+console.log("TODO - Room.prototype.getCandidatesRuleLeadActions: Add loops to have convination Entrances X People X Actions");
+    for (var roomid in this.entrance) {
+        var destination = this.entrance[roomid];
+        var candidate = {
+            "L": lead,
+            "D": destination,
+            "Math": Math
+        };
+        if (rule.isValidCandidate(candidate)) {
+            candidates.push(candidate);
+        }
+    }
+    return candidates;
 };
