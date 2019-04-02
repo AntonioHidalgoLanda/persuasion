@@ -21,6 +21,7 @@ Room.prototype.getName = function () {
     return (this.hasOwnProperty("textName")) ? this.textName : this.id;
 };
 
+/* Interaction with other rooms*/
 Room.prototype.setEntrance = function (room) {
     "use strict";
     if (!Room.nodes.hasOwnProperty(room.id)) {
@@ -112,22 +113,27 @@ Room.prototype.dreamNeighbouhood = function () {
     return this;
 };
 
-
-/*
-format
-var jsonmap = {
-    "nodes": [
-		{"name": "node1", "group": 1},
-		{"name": "node2", "group": 2},
-		{"name": "node3", "group": 2},
-		{"name": "node4", "group": 3}
-	],
-	"links": [
-		{"source": 2, "target": 1, "weight": 1},
-		{"source": 0, "target": 2, "weight": 3}
-	]
+/* interaction with inhabitants */
+Room.prototype.enter = function (inhabitant) {
+    "use strict";
+    if (inhabitant.hasOwnProperty("currentRoom")) {
+        inhabitant.currentRoom.inhabitants[inhabitant.id] = null;
+        inhabitant.currentRoom = this;
+    }
+    this.inhabitants[inhabitant.id] = inhabitant;
+    
+    return this;
 };
-*/
+
+Room.prototype.enterGroup = function (group) {
+    "use strict";
+    for (var inhabitant in group) {
+        this.enter(inhabitant);
+    }
+    return this;
+};
+
+/* D3 Map Functions */
 Room.prototype.getD3SjonMap = function () {
     'use strict';
     var i = 0;
@@ -163,8 +169,8 @@ Room.ruleSet = {
 };
 */
 Room.ruleSet = {};
-var condition = "L.pathLikehood[R.pathEntry] >= D.pathEntryLevel[R.pathEntry]";
-var reaction = "D.inhabitants[L.id] = L; S.inhabitants[L.id] = null;";
+var condition = "L.pathLikehood[D.pathEntry] >= D.pathEntryLevel";
+var reaction = "D.enter(L)";
 //Room.ruleSet.go = new Rule(condition, reaction);
 
 Room.prototype.getRules = function () {
