@@ -1,4 +1,4 @@
-/*global Rule*/
+/*global Rule, Inhabitant*/
 function Room(id) {
     "use strict";
     this.id = (id === undefined || id === null) ? "room_" + Math.floor(Math.random() * (1000 - 1)) : id;
@@ -118,8 +118,8 @@ Room.prototype.enter = function (inhabitant) {
     "use strict";
     if (inhabitant.hasOwnProperty("currentRoom")) {
         inhabitant.currentRoom.inhabitants[inhabitant.id] = null;
-        inhabitant.currentRoom = this;
     }
+    inhabitant.currentRoom = this;
     this.inhabitants[inhabitant.id] = inhabitant;
     
     return this;
@@ -128,7 +128,9 @@ Room.prototype.enter = function (inhabitant) {
 Room.prototype.enterGroup = function (group) {
     "use strict";
     for (var inhabitant in group) {
-        this.enter(inhabitant);
+        if (group[inhabitant] instanceof Inhabitant) {
+            this.enter(group[inhabitant]);
+        }
     }
     return this;
 };
@@ -171,7 +173,7 @@ Room.ruleSet = {
 Room.ruleSet = {};
 var condition = "L.pathLikehood[D.pathEntry] >= D.pathEntryLevel";
 var reaction = "D.enter(L)";
-//Room.ruleSet.go = new Rule(condition, reaction);
+Room.ruleSet.go = new Rule(condition, reaction);
 
 Room.prototype.getRules = function () {
     'use strict';

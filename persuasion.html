@@ -11,15 +11,11 @@ and open the template in the editor.
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <!-- Styles -->
         <link rel="stylesheet" type="text/css" href="/styles/map.css">
-        <!--<link rel="stylesheet" type="text/css" href="/DreamingMachine/css/basic.css">-->
         <!-- Libraries-->
         <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
         <script src="http://d3js.org/d3.v2.min.js?2.9.3"></script>
         <!-- Core Components -->
         <script type="text/javascript" src="https://cdn.jsdelivr.net/gh/AntonioHidalgoLanda/jssimpleruleengine@master/JSObjects/rule.js"></script>
-        <script type="text/javascript" src="https://cdn.jsdelivr.net/gh/AntonioHidalgoLanda/jssimpleruleengine@master/JSObjects/guiFacts.js"></script>
-        <script type="text/javascript" src="https://cdn.jsdelivr.net/gh/AntonioHidalgoLanda/jssimpleruleengine@master/JSObjects/guiRule.js"></script>
-        
         <!-- JS Objects -->
         <script type="text/javascript" src="JSObjects/inhabitant.js"></script>
         <script type="text/javascript" src="JSObjects/action.js"></script>
@@ -44,13 +40,7 @@ and open the template in the editor.
         
         
     </body>
-    <!-- // This might go in a different file. We are using a Catolg from test -->
     <script type="text/javascript">
-        var handlerLoadRule = function(rule, divId) {
-            return function() {
-                var rg = new RuleGUI(ruleSet[rule], fact, jQuery("#" + divId), {"Math": Math});
-            };
-        }
         
         // Entities
         var actions = {};
@@ -75,6 +65,8 @@ and open the template in the editor.
         room.textName = "Generic Room";
         room.dreamNeighbouhood();
         room.enterGroup(fact);
+        console.log("rooom");
+        console.log(room);
 /*
         console.log("nodes");
         console.log(Room.nodes);
@@ -83,11 +75,10 @@ and open the template in the editor.
 */
         
         // Visualization
-        var guiFacts = new FactsGUI(fact, jQuery("#gui-rule-div"));
-        
+        /*
         var viewInhabitant = new BaseView("gui-rules-div", fact.RS0_mainchar_000, actions);
         viewInhabitant.setViewee(fact.RS0_inhabitant_001);
-        
+        */
         var viewRoom = new BaseView("gui-room-div", fact.RS0_mainchar_000, actions);
         viewRoom.setViewee(room);
         

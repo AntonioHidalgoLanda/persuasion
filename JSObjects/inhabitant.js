@@ -97,7 +97,17 @@ Inhabitant.ruleSet = {
 // TODO - remplace this by something more sensible, this is only for test
 Inhabitant.prototype.description = function () {
     'use strict';
-    return JSON.stringify(this);
+    var seen = [];
+    // return JSON.stringify(this); // Hack to resolve Inhabitant being a cyclic object
+    return JSON.stringify(this, function(key, val) {
+       if (val != null && typeof val == "object") {
+            if (seen.indexOf(val) >= 0) {
+                return;
+            }
+            seen.push(val);
+        }
+        return val;
+    });
 };
 
 Inhabitant.prototype.getRules = function () {
