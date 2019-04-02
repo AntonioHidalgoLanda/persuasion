@@ -25,20 +25,16 @@ and open the template in the editor.
         <script type="text/javascript" src="JSView/mapView.js"></script>
     </head>
     <body>
-        <a href="/pickuatest.html">link</a>
+        <!--
         <div id="gui-rules-div">
         </div>
         <div id="gui-rule-div">
             Loading...
         </div>
+        -->
         <div id="gui-room-div">
             Loading...
         </div>
-        <div id="gui-map-div">
-            Loading...
-        </div>
-        
-        
     </body>
     <script type="text/javascript">
         
@@ -46,6 +42,7 @@ and open the template in the editor.
         var actions = {};
         var fact = {};
         fact.RS0_mainchar_000 = Inhabitant.createLeader();
+        fact.RS0_mainchar_000.textName = "Me";
 
         fact.RS0_inhabitant_000 = new Inhabitant();
         fact.RS0_inhabitant_001 = new Inhabitant();
@@ -58,7 +55,7 @@ and open the template in the editor.
         actions.RS0_action_001O = fact.RS0_action_001O;
         
         
-        fact.RS0_inhabitant_001.name = "Unknown Person";
+        fact.RS0_inhabitant_001.textName = "Unknown Person";
         fact.RS0_inhabitant_001.imageUri = "img/avatar1.png";
         
         var room = new Room();

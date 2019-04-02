@@ -164,9 +164,8 @@ BaseView.prototype.refreshInhabitants = function () {
     if (this.viewee !== null && this.viewee.hasOwnProperty("inhabitants")) {
         for (var id in this.viewee.inhabitants) {
             inhabitant = this.viewee.inhabitants[id];
-console.log("TODO - Define Inhabitant.getName()");
             this.inhabitantsDiv.append(jQuery('<button/>', {
-                text: inhabitant.id,
+                text: inhabitant.getName(),
                 click: this.handerChangeViewee(inhabitant)
             }));
         }

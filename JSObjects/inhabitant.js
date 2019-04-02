@@ -17,6 +17,11 @@ function Inhabitant(id) {
 // TODO: resume(room) // if (room in intentions.goto())GoTo room; resumeGoals(); resumeIntentions(); resumeWorld();
 // TODO: Attempt(Intention(room))
 
+Inhabitant.prototype.getName = function () {
+    "use strict";
+    return (this.hasOwnProperty("textName")) ? this.textName : this.id;
+};
+
 Inhabitant.createLeader = function (id, time, energy, cash) {
     "use strict";
     var inhabitant = new Inhabitant(id);
