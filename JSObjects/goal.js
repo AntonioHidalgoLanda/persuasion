@@ -12,9 +12,9 @@ Goal.INITIAL_DURATION = 5;
 
 Goal.CONDITION_INSTINCT_ACHIEVEMNENT = "L.path >= goal.intensity";
 Goal.REACTION_INSTINCT_ACHIEVEMNENT = "true";   // destroy the action
-Goal.CONDITION_INSTINCT_DIVIDE = "";    // urgePath()
-Goal.REACTION_INSTINCT_DIVIDE = "";
-Goal.CONDITION_PATH_FOLLOWER_ACHIEVEMNENT = "";
+Goal.CONDITION_INSTINCT_DIVIDE = "";    // urgePath() + prioritizeIntention()
+Goal.REACTION_INSTINCT_DIVIDE = "";     
+Goal.CONDITION_PATH_FOLLOWER_ACHIEVEMNENT = "";     //urgePath() + prioritizeIntention()
 Goal.REACTION_PATH_FOLLOWER_ACHIEVEMNENT = "";
 Goal.CONDITION_PATH_FOLLOWER_DIVIDE = "";
 Goal.REACTION_PATH_FOLLOWER_DIVIDE = "";
@@ -34,6 +34,7 @@ Goal.createIntinct = function (path, intensity) {
     
     goal.path = path;
     goal.intensity = intensity;
+    goal.priority = -1;
     
     return goal;
 };
@@ -46,6 +47,7 @@ Goal.createPathFollowers = function (people, path, rapport_level, path_level) {
     goal.path = path;
     goal.rapport_level = rapport_level;
     goal.path_level = path_level;
+    goal.duration = -1;
     
     return goal;
 };
