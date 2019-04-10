@@ -16,6 +16,10 @@ Goal.MAX_INTENTIONS_PER_ROUND = 3;
 /*
 e.g. vent-out, get-privacy, drag-attention
 
+facts = {
+    "self": this
+}
+
 */
 Goal.createIntinct = function (path, intensity) {
     "use strict";
@@ -26,12 +30,19 @@ Goal.createIntinct = function (path, intensity) {
     goal.priority = -1;
     
     goal.isAchievedFunction = function (facts) {
-        return facts.L.path_level[this.path] >= this.intensity;
+        return facts.self.path_level[this.path] >= this.intensity;
     };
     
     return goal;
 };
 
+/*
+
+facts = {
+    "self": this,
+    "inhabitants": {inhabitant.id:inhabitant, ..}
+}
+*/
 Goal.createPathFollowers = function (people, path, rapport_level, path_level) {
     "use strict";
     var goal = new Goal(Goal.RULE_PATH_FOLLOWER_ACHIEVEMNENT);
@@ -42,10 +53,19 @@ Goal.createPathFollowers = function (people, path, rapport_level, path_level) {
     goal.path_level = path_level;
     goal.duration = -1;
     
-    // WorldModel.levelGreaterEqual(path, rapport_level, path_level) > people
     goal.isAchievedFunction = function (facts) {
-console.log("On Development ...Including for aggregation rules (count, sum, avrg, max min)");
-        return facts.L.path_level[this.path] >= this.intensity;
+        var peopleCount = 0, inhabitantID, inhabitant;
+        if (facts.hasOwnProperty("self") && facts.self.hasOwnProperty("rapport")) {
+            for (inhabitantID in facts.self.rapport) {
+                if (facts.self.rapport.hasOwnProperty(inhabitantID) && facts.self.rapport[inhabitantID] >= this.rapport_level) {
+                    inhabitant = facts.inhabitants[inhabitantID];
+                    if (inhabitant.pathLikehood[this.path] >= this.path_level) {
+                        peopleCount += 1;
+                    }
+                }
+            }
+        }
+        return peopleCount >= this.people;
     };
     return goal;
 };
@@ -165,11 +185,26 @@ Goal.prototype.updateRatting = function (rule, candidate, worldModel, feedback) 
   
 };
 
-var rate_extractFeatures = function (candidate) {
+var rate_extractFeatures = function (model) {
       "use strict";
-    // iterate and re-iterate
-    console.log("On Development...."+candidate);
-    
+    var extract, seen = [];
+
+    extract = JSON.stringify(model, function(key, val) {
+       if (val != null && typeof val == "object") {
+            if (seen.indexOf(val) >= 0) {
+                return;
+            }
+            seen.push(val);
+        }
+        return val;
+    });
+console.log("On Development... This won't work for containers (candidate) where an element is repeated");
+    // EXCEPTION TO HANDLE
+    // candidate may repeat the same object with different tags, this has to be handle
+    // inhabitant contains room, which contains a list of the rest of inhabitants in the room. This has to be handled too
+    // 
+    console.log("On Development... we have a JSOM object but we want a simple Map")
+    return extract;
 };
 var rate_normalizeFeatures = function (worldModel, sample) {
       "use strict";
@@ -178,11 +213,11 @@ var rate_normalizeFeatures = function (worldModel, sample) {
 };
 var rate_findClosestNeighbour = function (worldModel, sample) {
       "use strict";
-    console.log("On Development...."+worldModel+sample);
+console.log("On Development...."+worldModel+sample);
 };
 var rate_updateNeighbour = function (worldModel, sample, feedback) {
       "use strict";
-    console.log("On Development...."+worldModel+sample+feedback);
+console.log("On Development...."+worldModel+sample+feedback);
 };
 var rate_alignment = function (){ // re-clustering, condensation and removing less relevant nodes 
       "use strict";
