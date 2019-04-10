@@ -9,15 +9,16 @@ function Goal(achivement, divide) {
 
 Goal.INITIAL_PRIORITY = 1;
 Goal.INITIAL_DURATION = 5;
+Goal.MAX_INTENTIONS_PER_ROUND = 3;
 
 Goal.CONDITION_INSTINCT_ACHIEVEMNENT = "L.path >= goal.intensity";
-Goal.REACTION_INSTINCT_ACHIEVEMNENT = "true";   // destroy the action
-Goal.CONDITION_INSTINCT_DIVIDE = "";    // urgePath() + prioritizeIntention()
-Goal.REACTION_INSTINCT_DIVIDE = "";     
-Goal.CONDITION_PATH_FOLLOWER_ACHIEVEMNENT = "";     //urgePath() + prioritizeIntention()
-Goal.REACTION_PATH_FOLLOWER_ACHIEVEMNENT = "";
-Goal.CONDITION_PATH_FOLLOWER_DIVIDE = "";
-Goal.REACTION_PATH_FOLLOWER_DIVIDE = "";
+Goal.REACTION_INSTINCT_ACHIEVEMNENT = "true";        // destroy the action (true)
+Goal.CONDITION_INSTINCT_DIVIDE = "";
+Goal.REACTION_INSTINCT_DIVIDE = "";                  // urgePath() + prioritizeIntention()
+Goal.CONDITION_PATH_FOLLOWER_ACHIEVEMNENT = "";      // WorldModel.levelGreaterEqual(path, rapport_level, path_level) > people
+Goal.REACTION_PATH_FOLLOWER_ACHIEVEMNENT = "";       // destroy the action/ upgrade goals
+Goal.CONDITION_PATH_FOLLOWER_DIVIDE = "";   
+Goal.REACTION_PATH_FOLLOWER_DIVIDE = "";             // urgePath() + prioritizeIntention()
 
 Goal.RULE_INSTINCT_ACHIEVEMNENT = new Rule(Goal.CONDITION_INSTINCT_ACHIEVEMNENT, Goal.REACTION_INSTINCT_ACHIEVEMNENT);
 Goal.RULE_INSTINCT_DIVIDE = new Rule(Goal.CONDITION_INSTINCT_DIVIDE, Goal.REACTION_INSTINCT_DIVIDE);
@@ -55,26 +56,50 @@ Goal.createPathFollowers = function (people, path, rapport_level, path_level) {
 
 Goal.prototype.isAchieved = function (worldModel) {
     "use strict";
-    var candidate = {};
-    candidate.worldModel = worldModel;
-    console.log("On Development....");
-    return this.rule_achieve.isValidCandidate(candidate);
+    var candidate;
+    console.log("On Development... worldView.getAchievementCandidates() ...Including for aggregation rules (count, sum, avrg, max min)");
+    for (candidate in worldModel.candidates) {
+        if (this.rule_achieve.isValidCandidate(candidate)) {
+            return true;
+        }
+    }
+    return false;
 };
 
 // Sub Goals or Intentions (actions)
-Goal.prototype.resolve = function (worldModel) {
+/*
+@param rules Rules available
+@param facts Facts/Objects available to create candidates
+*/
+Goal.prototype.resolve = function (rules, facts, worldModel) {
     "use strict";
-    var candidate = {};
-    console.log("On Development.... priority check, Math.random>priority...");
-    candidate.worldModel = worldModel;
-    console.log("On Development....");
-    // check priority
-    // execute rule
-    // if direct actions, execute actions
+    var candidate, intentions = [];
+    console.log("On Development... Rule.prototype.getCandidates(facts)");
+    for (var ruleid in rules){
+        candidates = rules[ruleid].getCandidates(facts);
+        for (var candidate_i in candidates){
+            var ratting = this.getRatting(rule, candidate, worldModel);
+            if (ratting > 0.5 || intentions.length === 0) {
+                intentions.push({
+                    "ratting": ratting,
+                    "ruleid": ruleid,
+                    "candidate": candidate
+                });
+            }
+        }
+    }
+    // var doneSomething = false;
+    for (int i = 0; i < intentions.length && i < Goal.MAX_INTENTIONS_PER_ROUND; i++) {
+        // if (ratting + goal > Math Random) {
+        //      rule.execute({},candidate)
+        //      doneSomething = true;
+        // }
+        // if (!doneSomething) intentions[0].rule.execute(intentions[0].candidate)
+    }
     // if subgoals, add to queue
     // reduce priority unless is -1 (max priority)
     // reduce duration unless is -1 (permanent)
-    return this.rule_divide.execute({}, candidate);
+    // return this.rule_divide.execute({}, candidate);
 };
 
 // Find actions to increase/decrease or places to increase/decrease path
@@ -97,10 +122,61 @@ Goal.prototype.addIntention = function () {
     
 };
 
-Goal.prototype.executeIntention = function () {
+Goal.prototype.executeIntentions = function () {
     "use strict";
     console.log("On Development....");
     
+};
+
+Goal.prototype.getRatting = function (rule, candidate, worldModel) {
+    "use strict";
+    var sample = {}
+    
+    Object.assign(sample, rate_extractFeatures(rule));
+    Object.assign(sample, rate_extractFeatures(candidate));
+    rate_normalizeFeatures(sample);
+    
+    return rate_findClosestNeighbour(worldModel, sample);
+};
+/*
+used when learing:
+ * after perform action
+ * with an action discovery/exploration of suroundings
+ * with action verval exchange with other inhabitant
+*/
+Goal.prototype.updateRatting = function (rule, candidate, worldModel, feedback) {
+      "use strict";
+    var sample = {};
+    Object.assign(sample, rate_extractFeatures(rule));
+    Object.assign(sample, rate_extractFeatures(candidate));
+    rate_normalizeFeatures(sample);
+    rate_updateNeighbour(worldModel, sample, feedback);
+    rate_alignment(); // re-clustering, condensation and removing less relevant nodes
+    return this;
+  
+};
+
+var rate_extractFeatures = function (candidate) {
+      "use strict";
+    console.log("On Development...."+candidate);
+    
+};
+var rate_normalizeFeatures = function (sample) {
+      "use strict";
+    console.log("On Development...."+sample);
+    
+};
+var rate_findClosestNeighbour = function (worldModel, sample) {
+      "use strict";
+    console.log("On Development...."+worldModel+sample);
+};
+var rate_updateNeighbour = function (worldModel, sample, feedback) {
+      "use strict";
+    console.log("On Development...."+worldModel+sample+feedback);
+};
+var rate_alignment = function (){ // re-clustering, condensation and removing less relevant nodes 
+      "use strict";
+    console.log("On Development....");
 };
 
 
