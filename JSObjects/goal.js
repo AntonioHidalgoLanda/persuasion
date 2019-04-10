@@ -201,8 +201,10 @@ var rate_extractFeatures = function (model) {
 console.log("On Development... This won't work for containers (candidate) where an element is repeated");
     // EXCEPTION TO HANDLE
     // candidate may repeat the same object with different tags, this has to be handle
+    //      unloop candidate
     // inhabitant contains room, which contains a list of the rest of inhabitants in the room. This has to be handled too
-    // 
+    //      unloop candidate?
+    //      return first ref on duplicates
     console.log("On Development... we have a JSOM object but we want a simple Map")
     return extract;
 };
