@@ -185,19 +185,42 @@ Goal.prototype.updateRatting = function (rule, candidate, worldModel, feedback) 
   
 };
 
+var extractFeatures = function(object, prefix, seen) {
+  "use strict";
+    var extract = {};
+    
+    for (var featureId in object) {
+        var feature = object[featureId];
+        switch (typeof feature) {
+            case 'number':
+            case 'string':
+            case 'boolean':
+                extract[prefix + ":" + featureId] = feature;
+                break;
+            case 'object':
+                if (feature != null) {
+                    if (seen.indexOf(feature) < 0) {
+                        seen.push(feature);
+                        // For Maps, we need to unwind so we have both, key and value
+                        extractFeatures(feature, prefix + ":" + featureId , seen);
+                        Object.assign(extract, extractFeatures(feature, prefix + ":" + featureId , seen));
+                    }
+console.log("else, add object as name/id");
+                }
+                break;
+        }
+    }
+    return extract;
+};
+
+
 var rate_extractFeatures = function (model) {
       "use strict";
-    var extract, seen = [];
+    var seen = [],
+        extract = extractFeatures(model, "", seen);
+console.log("Include rooms in seen to avoid skyping inhabitanths");
 
-    extract = JSON.stringify(model, function(key, val) {
-       if (val != null && typeof val == "object") {
-            if (seen.indexOf(val) >= 0) {
-                return;
-            }
-            seen.push(val);
-        }
-        return val;
-    });
+
 console.log("On Development... This won't work for containers (candidate) where an element is repeated");
     // EXCEPTION TO HANDLE
     // candidate may repeat the same object with different tags, this has to be handle
