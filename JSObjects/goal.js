@@ -160,12 +160,15 @@ Goal.prototype.getRatting = function (rule, candidate, worldModel) {
     var sample = {}
     
     Object.assign(sample, rate_extractFeatures(rule));
-    Object.assign(sample, rate_extractFeatures(candidate));
+    Object.assign(sample, rate_extractFeatures(candidate, "", worldModel.rooms));   // Avoid skiping inhabitants
     rate_normalizeFeatures(worldModel, sample);
     
     return rate_findClosestNeighbour(worldModel, sample);
 };
 /*
+Note
+    worldModel.rooms : all rooms
+
 used when learing:
  * after perform action
  * with an action discovery/exploration of suroundings
@@ -176,7 +179,7 @@ Goal.prototype.updateRatting = function (rule, candidate, worldModel, feedback) 
     var sample = {};
 
     Object.assign(sample, rate_extractFeatures(rule));
-    Object.assign(sample, rate_extractFeatures(candidate));
+    Object.assign(sample, rate_extractFeatures(candidate, "", worldModel.rooms));   // Avoid skiping inhabitants
     rate_normalizeFeatures(worldModel, sample);
     rate_updateNeighbour(worldModel, sample, feedback);
     rate_alignment(); // re-clustering, condensation and removing less relevant nodes
@@ -185,9 +188,15 @@ Goal.prototype.updateRatting = function (rule, candidate, worldModel, feedback) 
   
 };
 
-var extractFeatures = function(object, prefix, seen) {
+var rate_extractFeatures = function(object, prefix, seen) {
   "use strict";
     var extract = {};
+    if (seen === undefined || seen === null) {
+        seen = [];
+    }
+    if (prefix === undefined || prefix === null) {
+        prefix = "";
+    }
     
     for (var featureId in object) {
         var feature = object[featureId];
@@ -201,11 +210,10 @@ var extractFeatures = function(object, prefix, seen) {
                 if (feature != null) {
                     if (seen.indexOf(feature) < 0) {
                         seen.push(feature);
-                        // For Maps, we need to unwind so we have both, key and value
-                        extractFeatures(feature, prefix + ":" + featureId , seen);
-                        Object.assign(extract, extractFeatures(feature, prefix + ":" + featureId , seen));
+                        Object.assign(extract, rate_extractFeatures(feature, prefix + ":" + featureId , seen));
+                    } else {
+                        extract[prefix + ":" + featureId] = featureId;
                     }
-console.log("else, add object as name/id");
                 }
                 break;
         }
@@ -213,32 +221,46 @@ console.log("else, add object as name/id");
     return extract;
 };
 
-
-var rate_extractFeatures = function (model) {
-      "use strict";
-    var seen = [],
-        extract = extractFeatures(model, "", seen);
-console.log("Include rooms in seen to avoid skyping inhabitanths");
-
-
-console.log("On Development... This won't work for containers (candidate) where an element is repeated");
-    // EXCEPTION TO HANDLE
-    // candidate may repeat the same object with different tags, this has to be handle
-    //      unloop candidate
-    // inhabitant contains room, which contains a list of the rest of inhabitants in the room. This has to be handled too
-    //      unloop candidate?
-    //      return first ref on duplicates
-    console.log("On Development... we have a JSOM object but we want a simple Map")
-    return extract;
-};
 var rate_normalizeFeatures = function (worldModel, sample) {
       "use strict";
     console.log("On Development...."+worldModel+sample);
     
 };
+
+/*
+Note, WorldModel.rooms contains all rooms
+WolrdModel.trained contains trained samples
+*/
+var rate_distance = function (obj1, obj2){
+      "use strict";
+    console.log("On Development....");
+};
+var rate_K=3;
 var rate_findClosestNeighbour = function (worldModel, sample) {
       "use strict";
 console.log("On Development...."+worldModel+sample);
+    var nodes = [];
+    
+    for (var itemRef in worldModel.trained) {
+        var item = worldModel.trained[itemRef];
+        var d = rate_distance(item, sample);
+        nodes.push({
+            "distance":d,
+            "ratting": item.ratting
+        });
+    }
+    nodes.sort(function(obj1, obj2){
+        return obj1.distance - obj2.distance; 
+    });
+    var ratting = 0;
+    var totaLength = 0;
+    for (var i =0; i < rate_K; i++) {
+        totaLength += nodes[i].distance; 
+    }
+    for (i =0; i < rate_K; i++) {
+        ratting += (1 - (nodes[i].distance/totaLength)) * nodes[i].ratting; 
+    }
+    return ratting;
 };
 var rate_updateNeighbour = function (worldModel, sample, feedback) {
       "use strict";
