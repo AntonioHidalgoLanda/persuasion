@@ -14,15 +14,19 @@ and open the template in the editor.
         <!-- Libraries-->
         <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
         <script src="http://d3js.org/d3.v2.min.js?2.9.3"></script>
-        <!-- Core Components -->
-        <script type="text/javascript" src="https://cdn.jsdelivr.net/gh/AntonioHidalgoLanda/jssimpleruleengine@master/JSObjects/rule.js"></script>
+        <!-- Core Components https://cdn.jsdelivr.net/gh/user/repo@master/file-->
+        <script type="text/javascript" src="https://cdn.jsdelivr.net/gh/AntonioHidalgoLanda/jssimpleruleengine@v1.4/JSObjects/rule.min.js"></script>
         <!-- JS Objects -->
         <script type="text/javascript" src="JSObjects/inhabitant.js"></script>
         <script type="text/javascript" src="JSObjects/action.js"></script>
         <script type="text/javascript" src="JSObjects/room.js"></script>
+        <script type="text/javascript" src="JSObjects/inference.js"></script>
+        <script type="text/javascript" src="JSObjects/goal.js"></script>
         <!-- View -->
         <script type="text/javascript" src="JSView/baseView.js"></script>
         <script type="text/javascript" src="JSView/mapView.js"></script>
+        <!-- Tesitng -->
+        <script type="text/javascript" src="tests/testGoals.js"></script>
     </head>
     <body>
         <div id="gui-room-div">
@@ -55,8 +59,8 @@ and open the template in the editor.
         room.textName = "Generic Room";
         room.dreamNeighbouhood();
         room.enterGroup(fact);
-        console.log("rooom");
-        console.log(room);
+        //console.log("room");
+        //console.log(room);
         
         // Visualization
         /*

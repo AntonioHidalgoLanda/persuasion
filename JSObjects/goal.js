@@ -1,11 +1,11 @@
-/*global Rule, Inference*/
-function Goal(achivement) {
+/*global Inference*/
+function Goal() {
     "use strict";
     this.priority = Goal.INITIAL_PRIORITY;
     this.duration = Goal.INITIAL_DURATION;
-    this.rule_achieve = (achivement instanceof Rule) ? achivement : new Rule();
     
     this.intentions = [];
+    
     this.inference = new Inference();
     this.isAchievedFunction = function () {return true; };
 }
@@ -31,7 +31,7 @@ Goal.createIntinct = function (path, intensity) {
     goal.priority = -1;
     
     goal.isAchievedFunction = function (facts) {
-        return facts.self.path_level[this.path] >= this.intensity;
+        return facts.self.pathLikehood[this.path] >= this.intensity;
     };
     
     return goal;
@@ -74,13 +74,10 @@ Goal.createPathFollowers = function (people, path, rapport_level, path_level) {
 
 Goal.prototype.isAchieved = function (facts) {
     "use strict";
-    if (this.duration >= 0 && this.duration !== -1) {
+    if (this.duration <= 0 && this.duration !== -1) {
         return true;
     }
-    if (this.isAchievedFunction(facts)) {
-        return true;
-    }
-    return false;
+    return this.isAchievedFunction(facts);
 };
 
 // Sub Goals or Intentions (actions)
@@ -88,10 +85,9 @@ Goal.prototype.isAchieved = function (facts) {
 @param rules Rules available
 @param facts Facts/Objects available to create candidates
 */
-Goal.prototype.resolve = function (rules, facts, worldModel) {
+Goal.prototype.resolve = function (rules, facts) {
     "use strict";
     var candidates, candidate, rule, ruleid, candidateI, ratting;
-console.log("On Development... Rule.prototype.getCandidates(facts)");
     this.clearIntentions();
     if (this.duration <= 0 && this.duration !== -1) {
         return this;
@@ -101,7 +97,7 @@ console.log("On Development... Rule.prototype.getCandidates(facts)");
         candidates = rules[ruleid].getCandidates(facts);
         for (candidateI in candidates) {
             candidate = candidates[candidateI];
-            ratting = this.getRatting(rule, candidate, worldModel);
+            ratting = this.getRatting(rule, candidate);
             this.addIntention(ratting, rule, candidate);
         }
     }
@@ -160,31 +156,29 @@ Goal.prototype.executeIntentions = function () {
     return this;
 };
 
-Goal.prototype.getRatting = function (rule, candidate, worldModel) {
+Goal.prototype.getRatting = function (rule, candidate) {
     "use strict";
     var sample = {}
     
-    Object.assign(sample, Inference.extractFeatures(rule));
-    Object.assign(sample, Inference.extractFeatures(candidate, "", worldModel.rooms));   // Avoid skiping inhabitants
+    Object.assign(sample, Inference.extractFeatures(rule, ":rule", Inference.FEATURE_EXTRACTION_UNLOOP_LEVEL));
+    Object.assign(sample, Inference.extractFeatures(candidate));   // Avoid skiping inhabitants
     this.inference.normalizeFeatures(sample);
 
     return this.inference.findClosestNeighbour(sample);
 };
-/*
-Note
-    worldModel.rooms : all rooms
 
+/*
 used when learing:
  * after perform action
  * with an action discovery/exploration of suroundings
  * with action verval exchange with other inhabitant
 */
-Goal.prototype.updateRatting = function (rule, candidate, worldModel, feedback) {
+Goal.prototype.updateRatting = function (rule, candidate, feedback) {
       "use strict";
     var sample = {};
 
-    Object.assign(sample, Inference.extractFeatures(rule));
-    Object.assign(sample, Inference.extractFeatures(candidate, "", worldModel.rooms));   // Avoid skiping inhabitants
+    Object.assign(sample, Inference.extractFeatures(rule, ":rule", Inference.FEATURE_EXTRACTION_UNLOOP_LEVEL));
+    Object.assign(sample, Inference.extractFeatures(candidate));   // Avoid skiping inhabitants
     this.inference.updateNeighbour(sample, feedback);
     this.inference.standarizeFeatures();
     this.inference.alignment(); // re-clustering, condensation and removing less relevant nodes

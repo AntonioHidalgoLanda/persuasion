@@ -6,12 +6,13 @@ function Inference() {
 
 Inference.K_NEIGHBOURGS = 3;
 Inference.DISCRETE_DISTANCE_ON_MISS = 1;
+Inference.FEATURE_EXTRACTION_UNLOOP_LEVEL = 2;
 
-Inference.extractFeatures = function (object, prefix, seen) {
+Inference.extractFeatures = function (object, prefix, level) {
     "use strict";
     var extract = {}, feature, featureId;
-    if (seen === undefined || seen === null) {
-        seen = [];
+    if (level === undefined) {
+        level = 0;
     }
     if (prefix === undefined || prefix === null) {
         prefix = "";
@@ -28,9 +29,8 @@ Inference.extractFeatures = function (object, prefix, seen) {
                 break;
             case 'object':
                 if (feature !== null) {
-                    if (seen.indexOf(feature) < 0) {
-                        seen.push(feature);
-                        Object.assign(extract, Inference.extractFeatures(feature, prefix + ":" + featureId, seen));
+                    if (level < Inference.FEATURE_EXTRACTION_UNLOOP_LEVEL) {
+                        Object.assign(extract, Inference.extractFeatures(feature, prefix + ":" + featureId, level + 1));
                     } else {
                         extract[prefix + ":" + featureId] = featureId;
                     }
@@ -51,12 +51,12 @@ z[] -> mean = 0; std = 1
 var populateStandarizedTrainingSet = function () {
     "use strict";
     var itemRef, item, feature;
+    this.stdTrainingSet = [];
     for (feature in this.standarized) {
         if (this.standarized.hasOwnProperty(feature)) {
             this.standarized[feature].mean = this.standarized[feature].total / this.standarized[feature].count;
             this.standarized[feature].stdDev = Math.abs(this.standarized[feature].max - this.standarized[feature].min);
             
-            this.stdTrainingSet = [];
             for (itemRef in this.trainedSet) {
                 if (this.trainedSet.hasOwnProperty(itemRef) && this.trainedSet[itemRef].hasOwnProperty(feature)) {
                     item = this.trainedSet[itemRef];
@@ -83,18 +83,20 @@ Inference.prototype.standarizeFeatures = function () {
             for (feature in item) {
                 if (item.hasOwnProperty(feature) && feature !== "ratting") {
                     if (!this.standarized.hasOwnProperty(feature)) {
-                        value = item[feature];
                         this.standarized[feature] = {
                             "count": 0,
-                            "total": 0,
-                            "max": 0,
-                            "min": 0
+                            "total": 0
                         };
-                        this.standarized[feature].count += 1;
-                        if (typeof item[feature] === "number") {
-                            this.standarized[feature].total += value;
-                            this.standarized[feature].max = Math.max(value, this.standarized[feature].max);
-                            this.standarized[feature].min = Math.min(value, this.standarized[feature].min);
+                    }
+                    value = item[feature];
+                    this.standarized[feature].count += 1;
+                    if (typeof item[feature] === "number") {
+                        this.standarized[feature].total += value;
+                        if (!this.standarized[feature].hasOwnProperty("max") || this.standarized[feature].max < value) {
+                            this.standarized[feature].max = value;
+                        }
+                        if (!this.standarized[feature].hasOwnProperty("min") || this.standarized[feature].min > value) {
+                            this.standarized[feature].min = value;
                         }
                     }
                 }
@@ -110,16 +112,13 @@ z = (x - Mean)/std_deviation
 */
 Inference.prototype.zScoreFeature = function (sample, feature) {
     "use strict";
-    var featureStd;
-    if (this.stdTrainingSet.length === 0 || !this.stdTrainingSet.hasOwnProperty(feature) || typeof feature !== "number") {
+    var featureStd, stdDev;
+    if (this.stdTrainingSet.length === 0 || !this.standarized.hasOwnProperty(feature) || typeof sample !== "number") {
         return sample;
     } else {
-        featureStd = this.stdTrainingSet[feature];
-        if (featureStd.stdDev === 0) {
-            return 0;
-        } else {
-            return (sample - featureStd.mean) / featureStd.stdDev;
-        }
+        featureStd = this.standarized[feature];
+        stdDev = (featureStd.stdDev === 0) ? 1 : featureStd.stdDev;
+        return (sample - featureStd.mean) / stdDev;
     }
 };
 
@@ -213,7 +212,7 @@ Inference.prototype.findClosestNeighbour = function (sample) {
 Inference.prototype.updateNeighbour = function (sample, feedback) {
     "use strict";
     var i = this.trainedSet.indexOf(sample);
-    if (i >= 0) {
+    if (i < 0) {
         sample.ratting = feedback;
         this.trainedSet.push(sample);
     } else {
