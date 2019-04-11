@@ -1,4 +1,4 @@
-/*global Rule*/
+/*global Rule, Inference*/
 function Goal(achivement) {
     "use strict";
     this.priority = Goal.INITIAL_PRIORITY;
@@ -6,6 +6,7 @@ function Goal(achivement) {
     this.rule_achieve = (achivement instanceof Rule) ? achivement : new Rule();
     
     this.intentions = [];
+    this.inference = new Inference();
     this.isAchievedFunction = function () {return true; };
 }
 
@@ -159,11 +160,11 @@ Goal.prototype.getRatting = function (rule, candidate, worldModel) {
     "use strict";
     var sample = {}
     
-    Object.assign(sample, rate_extractFeatures(rule));
-    Object.assign(sample, rate_extractFeatures(candidate, "", worldModel.rooms));   // Avoid skiping inhabitants
-    rate_normalizeFeatures(worldModel, sample);
+    Object.assign(sample, Inference.extractFeatures(rule));
+    Object.assign(sample, Inference.extractFeatures(candidate, "", worldModel.rooms));   // Avoid skiping inhabitants
+    this.inference.normalizeFeatures(sample);
     
-    return rate_findClosestNeighbour(worldModel, sample);
+    return this.inference.findClosestNeighbour(sample);
 };
 /*
 Note
@@ -178,97 +179,12 @@ Goal.prototype.updateRatting = function (rule, candidate, worldModel, feedback) 
       "use strict";
     var sample = {};
 
-    Object.assign(sample, rate_extractFeatures(rule));
-    Object.assign(sample, rate_extractFeatures(candidate, "", worldModel.rooms));   // Avoid skiping inhabitants
-    rate_normalizeFeatures(worldModel, sample);
-    rate_updateNeighbour(worldModel, sample, feedback);
-    rate_alignment(); // re-clustering, condensation and removing less relevant nodes
+    Object.assign(sample, Inference.extractFeatures(rule));
+    Object.assign(sample, Inference.extractFeatures(candidate, "", worldModel.rooms));   // Avoid skiping inhabitants
+    this.inference.normalizeFeatures(sample);
+    this.inference.updateNeighbour(sample, feedback);
+    this.inference.alignment(); // re-clustering, condensation and removing less relevant nodes
 
     return this;
   
 };
-
-var rate_extractFeatures = function(object, prefix, seen) {
-  "use strict";
-    var extract = {};
-    if (seen === undefined || seen === null) {
-        seen = [];
-    }
-    if (prefix === undefined || prefix === null) {
-        prefix = "";
-    }
-    
-    for (var featureId in object) {
-        var feature = object[featureId];
-        switch (typeof feature) {
-            case 'number':
-            case 'string':
-            case 'boolean':
-                extract[prefix + ":" + featureId] = feature;
-                break;
-            case 'object':
-                if (feature != null) {
-                    if (seen.indexOf(feature) < 0) {
-                        seen.push(feature);
-                        Object.assign(extract, rate_extractFeatures(feature, prefix + ":" + featureId , seen));
-                    } else {
-                        extract[prefix + ":" + featureId] = featureId;
-                    }
-                }
-                break;
-        }
-    }
-    return extract;
-};
-
-var rate_normalizeFeatures = function (worldModel, sample) {
-      "use strict";
-    console.log("On Development...."+worldModel+sample);
-    
-};
-
-/*
-Note, WorldModel.rooms contains all rooms
-WolrdModel.trained contains trained samples
-*/
-var rate_distance = function (obj1, obj2){
-      "use strict";
-    console.log("On Development....");
-};
-var rate_K=3;
-var rate_findClosestNeighbour = function (worldModel, sample) {
-      "use strict";
-console.log("On Development...."+worldModel+sample);
-    var nodes = [];
-    
-    for (var itemRef in worldModel.trained) {
-        var item = worldModel.trained[itemRef];
-        var d = rate_distance(item, sample);
-        nodes.push({
-            "distance":d,
-            "ratting": item.ratting
-        });
-    }
-    nodes.sort(function(obj1, obj2){
-        return obj1.distance - obj2.distance; 
-    });
-    var ratting = 0;
-    var totaLength = 0;
-    for (var i =0; i < rate_K; i++) {
-        totaLength += nodes[i].distance; 
-    }
-    for (i =0; i < rate_K; i++) {
-        ratting += (1 - (nodes[i].distance/totaLength)) * nodes[i].ratting; 
-    }
-    return ratting;
-};
-var rate_updateNeighbour = function (worldModel, sample, feedback) {
-      "use strict";
-console.log("On Development...."+worldModel+sample+feedback);
-};
-var rate_alignment = function (){ // re-clustering, condensation and removing less relevant nodes 
-      "use strict";
-    console.log("On Development....");
-};
-
-
