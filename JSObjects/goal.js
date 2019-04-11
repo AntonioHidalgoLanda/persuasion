@@ -143,15 +143,19 @@ Goal.prototype.executeIntentions = function () {
     "use strict";
     var p = Math.random(), intention;
     console.log("On Development... reframe how to manage priorities (goal) and rattings (intention)");
+    console.log("On Development... feedback to world model");
     // var doneSomething = false;
     for (var i = 0; i < this.intentions.length && i < Goal.MAX_INTENTIONS_PER_ROUND; i++) {
         intention = this.intentions[i];
         if (intention.ratting * this.priority > p) {
             intention.rule.execute({}, intention.candidate);
+            // check results
+            // feedback = evaluateGoal (WM);
+            //this.inference.updateNeighbour(sample, feedback);
         }
     }
     // if (!doneSomething) {this.intentions[0].rule.execute(this.intentions[0].candidate)}
-    // update worldModel
+    //
 
     return this;
 };
@@ -163,7 +167,7 @@ Goal.prototype.getRatting = function (rule, candidate, worldModel) {
     Object.assign(sample, Inference.extractFeatures(rule));
     Object.assign(sample, Inference.extractFeatures(candidate, "", worldModel.rooms));   // Avoid skiping inhabitants
     this.inference.normalizeFeatures(sample);
-    
+
     return this.inference.findClosestNeighbour(sample);
 };
 /*
@@ -181,8 +185,8 @@ Goal.prototype.updateRatting = function (rule, candidate, worldModel, feedback) 
 
     Object.assign(sample, Inference.extractFeatures(rule));
     Object.assign(sample, Inference.extractFeatures(candidate, "", worldModel.rooms));   // Avoid skiping inhabitants
-    this.inference.normalizeFeatures(sample);
     this.inference.updateNeighbour(sample, feedback);
+    this.inference.standarizeFeatures();
     this.inference.alignment(); // re-clustering, condensation and removing less relevant nodes
 
     return this;

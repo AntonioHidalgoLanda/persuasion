@@ -97,7 +97,7 @@ Inhabitant.prototype.getCandidatesRuleLeadActions = function (rule, lead, action
     return candidates;
 };
 
-var condition = "(L.energy >= action.cost) && " +
+var condition = "(L !== T) && (L.energy >= action.cost) && " +
     " T.isRapportLevelGreater(L.id, action.levelTrust)" +
     " && (T.isPathLevelGreater(action.path, action.levelSkill)" +
     " || L.isPathLevelGreater(action.path, action.levelSkill))";
