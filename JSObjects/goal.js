@@ -85,7 +85,7 @@ Goal.prototype.isAchieved = function (facts) {
 @param rules Rules available
 @param facts Facts/Objects available to create candidates
 */
-Goal.prototype.resolve = function (rules, facts) {
+Goal.prototype.resolve = function (rules, facts, predefined) {
     "use strict";
     var candidates, candidate, rule, ruleid, candidateI, ratting;
     this.clearIntentions();
@@ -94,7 +94,7 @@ Goal.prototype.resolve = function (rules, facts) {
     }
     for (ruleid in rules) {
         rule = rules[ruleid];
-        candidates = rules[ruleid].getCandidates(facts);
+        candidates = rules[ruleid].getCandidates(facts, predefined);
         for (candidateI in candidates) {
             candidate = candidates[candidateI];
             ratting = this.getRatting(rule, candidate);
