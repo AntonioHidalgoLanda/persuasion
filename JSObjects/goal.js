@@ -66,7 +66,7 @@ Goal.createPathFollowers = function (people, path, rapport_level, path_level) {
                 }
             }
         }
-        return peopleCount >= this.people;
+        return peopleCount - this.people;
     };
     return goal;
 };
