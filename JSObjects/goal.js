@@ -19,7 +19,7 @@ Goal.FEEDBACK_THRESHOLD = 0.2;
 
 
 /*
-This method should be moved to Inhabitant
+TODO: This method should be moved to Inhabitant
 
 e.g. vent-out, get-privacy, drag-attention
 facts = {
@@ -42,7 +42,7 @@ Goal.createIntinct = function (path, intensity) {
 };
 
 /*
-This method should be moved to Inhabitant
+TODO: This method should be moved to Inhabitant
 */
 Goal.createPathFollowers = function (people, path, rapport_level, path_level) {
     "use strict";

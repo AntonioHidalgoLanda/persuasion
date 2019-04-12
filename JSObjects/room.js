@@ -175,6 +175,7 @@ Room.ruleSet = {};
 var condition = "D.pathEntryLevel ===0 || L.pathLikehood[D.pathEntry] >= D.pathEntryLevel";
 var reaction = "D.enter(L)";
 Room.ruleSet.go = new Rule(condition, reaction);
+//Room.ruleSet.work = new Rule(Action.work.condition, Action.work.reaction);
 
 Room.prototype.getRules = function () {
     'use strict';
