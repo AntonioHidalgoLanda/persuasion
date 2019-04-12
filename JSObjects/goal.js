@@ -3,16 +3,19 @@ function Goal() {
     "use strict";
     this.priority = Goal.INITIAL_PRIORITY;
     this.duration = Goal.INITIAL_DURATION;
+    this.intentionMinThreshold = Goal.DEFAULT_INTENTION_MIN_THRESHOLD;
     
     this.intentions = [];
     
     this.inference = new Inference();
-    this.isAchievedFunction = function () {return true; };
+    this.achievedFunction = function () {return 0; };
 }
 
 Goal.INITIAL_PRIORITY = 1;
 Goal.INITIAL_DURATION = 5;
-Goal.MAX_INTENTIONS_PER_ROUND = 3;
+Goal.MAX_INTENTIONS_PER_ROUND = 2;
+Goal.DEFAULT_INTENTION_MIN_THRESHOLD = 0.5;
+Goal.FEEDBACK_THRESHOLD = 0.2;
 
 /*
 e.g. vent-out, get-privacy, drag-attention
@@ -80,12 +83,8 @@ Goal.prototype.isAchieved = function (facts) {
     return this.achievedFunction(facts) >= 0;
 };
 
-// Sub Goals or Intentions (actions)
-/*
-@param rules Rules available
-@param facts Facts/Objects available to create candidates
-*/
-Goal.prototype.resolve = function (rules, facts, predefined) {
+
+Goal.prototype.calculateIntentions = function (rules, facts, predefined) {
     "use strict";
     var candidates, candidate, rule, ruleid, candidateI, ratting;
     this.clearIntentions();
@@ -93,15 +92,33 @@ Goal.prototype.resolve = function (rules, facts, predefined) {
         return this;
     }
     for (ruleid in rules) {
-        rule = rules[ruleid];
-        candidates = rules[ruleid].getCandidates(facts, predefined);
-        for (candidateI in candidates) {
-            candidate = candidates[candidateI];
-            ratting = this.getRatting(rule, candidate);
-            this.addIntention(ratting, rule, candidate);
+        if (rules.hasOwnProperty(ruleid)) {
+            rule = rules[ruleid];
+            candidates = rules[ruleid].getCandidates(facts, predefined);
+            for (candidateI in candidates) {
+                if (candidates.hasOwnProperty(candidateI)) {
+                    candidate = candidates[candidateI];
+                    ratting = this.getRatting(rule, candidate);
+                    this.addIntention(ratting, rule, candidate);
+                }
+            }
         }
     }
-    this.executeIntentions();
+    return this.intentions;
+};
+
+/*
+@param rules Rules available
+@param facts Facts/Objects available to create candidates
+@param predefined - Candidate which is partially constructed, the extended candidates should keep existing assignments
+*/
+Goal.prototype.resolve = function (rules, facts, predefined) {
+    "use strict";
+    
+    this.calculateIntentions(rules, facts, predefined);
+
+    this.executeIntentions(facts);
+    
     // max priority
     if (this.priority >= 0) {
         this.priority -= 1;
@@ -120,11 +137,14 @@ Goal.prototype.clearIntentions = function () {
 };
 
 
+/*
+The way it works, if all intention are below threshold, the first one will come up, which is a bit random
+this, however, provides a random mutation element into the algorithm
+*/
 Goal.prototype.addIntention = function (ratting, rule, candidate) {
     "use strict";
-    console.log("On Development... Defining criteria to add to intentions");
     
-    if (ratting > 0.5 || this.intentions.length === 0) {
+    if (ratting > this.intentionMinThreshold || this.intentions.length === 0) {
         this.intentions.push({
             "ratting": ratting,
             "rule": rule,
@@ -135,35 +155,35 @@ Goal.prototype.addIntention = function (ratting, rule, candidate) {
     return this;
 };
 
-Goal.prototype.executeIntentions = function () {
+Goal.prototype.executeIntentions = function (facts) {
     "use strict";
-    var p = Math.random(), intention;
-    console.log("On Development... reframe how to manage priorities (goal) and rattings (intention)");
-    console.log("On Development... feedback to world model");
-    console.log("Check this.achievedFunction(facts) before runing the intentions and after running the intentions. If there is positive change, updateRatting with new ratting value.");
-    // var doneSomething = false;
-    for (var i = 0; i < this.intentions.length && i < Goal.MAX_INTENTIONS_PER_ROUND; i++) {
+    var intention, i, achievedPre, achievedPost, feedback;
+    
+    this.intentions.sort(function (obj1, obj2) {
+        // greater to lesser
+        return obj2.ratting - obj1.ratting;
+    });
+    
+    for (i = 0; i < this.intentions.length && i < Goal.MAX_INTENTIONS_PER_ROUND; i += 1) {
         intention = this.intentions[i];
-        if (intention.ratting * this.priority > p) {
-            intention.rule.execute({}, intention.candidate);
-            // check results
-            // feedback = achievedFunction (WM);
-            //this.inference.updateRatting(sample, feedback);
+        achievedPre = this.achievedFunction(facts);
+        intention.rule.execute({}, intention.candidate);
+        achievedPost = this.achievedFunction(facts);
+        if (Math.abs(achievedPre - achievedPost) >= Goal.FEEDBACK_THRESHOLD) {
+            feedback = (achievedPre < achievedPost) ? achievedPost : -achievedPost;
+            this.updateRatting(intention.rule, intention.candidate, feedback);
         }
     }
-    // if (!doneSomething) {this.intentions[0].rule.execute(this.intentions[0].candidate)}
-    //
 
     return this;
 };
 
 Goal.prototype.getRatting = function (rule, candidate) {
     "use strict";
-    var sample = {}
+    var sample = {};
     
     Object.assign(sample, Inference.extractFeatures(rule, ":rule", Inference.FEATURE_EXTRACTION_UNLOOP_LEVEL));
     Object.assign(sample, Inference.extractFeatures(candidate));   // Avoid skiping inhabitants
-    this.inference.standarizeFeatures();
 
     return this.inference.findClosestNeighbour(sample);
 };
@@ -175,7 +195,7 @@ used when learing:
  * with action verval exchange with other inhabitant
 */
 Goal.prototype.updateRatting = function (rule, candidate, feedback) {
-      "use strict";
+    "use strict";
     var sample = {};
 
     Object.assign(sample, Inference.extractFeatures(rule, ":rule", Inference.FEATURE_EXTRACTION_UNLOOP_LEVEL));

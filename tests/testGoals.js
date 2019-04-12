@@ -88,8 +88,17 @@ console.log(instinct.isAchieved({"self": test_facts.RS0_inhabitant_001}));
 
 
 console.log("Test - Instincts:: Resolve");
-console.log(Inhabitant.ruleSet.persuade.getCandidates(test_facts, {"T": test_facts.RS0_inhabitant_001}));
-//instinct.resolve(Inhabitant.ruleSet, test_facts, {"L": test_facts.RS0_mainchar_000});
+// note that only RS0_mainchar_000 can be L
+console.log("candidates");
+console.log(Inhabitant.ruleSet.persuade.getCandidates(test_facts, {"L": test_facts.RS0_mainchar_000}));
+instinct.calculateIntentions(Inhabitant.ruleSet, test_facts, {"L": test_facts.RS0_mainchar_000});
+console.log("intentions");
+console.log(instinct.intentions);
+
+test_facts.self = test_facts.RS0_mainchar_000;
+instinct.resolve(Inhabitant.ruleSet, test_facts, {"L": test_facts.RS0_mainchar_000});
+console.log(instinct);
+
 
 
 console.log("Test - creation of Goal - " + levelPath + " level on " + path + ", x" + people + "followers with " + levelRapport + "rapport.");

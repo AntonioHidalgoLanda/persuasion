@@ -5,6 +5,8 @@ function Inference() {
 }
 
 Inference.K_NEIGHBOURGS = 3;
+Inference.POPULATION_TARGET = 10; // when condensation is applied, we will reduce the population to this number
+Inference.POPULATION_MAX = 15; // at this limit, the condensation will be applied
 Inference.DISCRETE_DISTANCE_ON_MISS = 1;
 Inference.FEATURE_EXTRACTION_UNLOOP_LEVEL = 2;
 
