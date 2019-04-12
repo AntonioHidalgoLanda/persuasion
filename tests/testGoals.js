@@ -45,6 +45,7 @@ room.dreamNeighbouhood();
 room.enterGroup(test_facts);
 Object.assign(test_facts, Room.nodes);
 
+
 console.log("Facts:");
 console.log(test_facts);
 console.log("Room:");
@@ -87,14 +88,14 @@ console.log(instinct.isAchieved({"self": test_facts.RS0_inhabitant_000}));
 console.log(instinct.isAchieved({"self": test_facts.RS0_inhabitant_001}));
 
 
-console.log("Test - Instincts:: Resolve");
 // note that only RS0_mainchar_000 can be L
-console.log("candidates");
+console.log("Test - Instincts:: candidates");
 console.log(Inhabitant.ruleSet.persuade.getCandidates(test_facts, {"L": test_facts.RS0_mainchar_000}));
 instinct.calculateIntentions(Inhabitant.ruleSet, test_facts, {"L": test_facts.RS0_mainchar_000});
-console.log("intentions");
+console.log("Test - Instincts:: intentions");
 console.log(instinct.intentions);
 
+console.log("Test - Instincts:: Resolve");
 test_facts.self = test_facts.RS0_mainchar_000;
 instinct.resolve(Inhabitant.ruleSet, test_facts, {"L": test_facts.RS0_mainchar_000});
 console.log(instinct);
@@ -106,17 +107,28 @@ var followers = Goal.createPathFollowers(people, path, levelRapport, levelPath);
 console.log(followers);
 
 
-console.log("Test - Followers:: Base World Model");
-
-
-console.log("Test - Followers:: Wolrd Model - Standarized");
-
 console.log("Test - Followers:: Is Achived - false");
 console.log(followers.isAchieved(test_facts));
 
+followers.people = 2;
+followers.rapport_level = 0;
+followers.path_level = 1;
+console.log("Test - creation of Goal - " + followers.path_level + " level on " + path + ", x" + followers.people + "followers with " + followers.rapport_level + "rapport.");
 console.log("Test - Followers:: Is Achieved - true");
 console.log(followers.isAchieved(test_facts));
 
+console.log("Test - Followers:: Base World Model");
+followers.updateRatting(Inhabitant.ruleSet.persuade, candidates[0], feedback);
+
+
+// note that only RS0_mainchar_000 can be L
+console.log("Test - Followers:: candidates");
+console.log(Inhabitant.ruleSet.persuade.getCandidates(test_facts, {"L": test_facts.RS0_mainchar_000}));
+followers.calculateIntentions(Inhabitant.ruleSet, test_facts, {"L": test_facts.RS0_mainchar_000});
+console.log("Test - Followers:: intentions");
+console.log(followers.intentions);
 
 console.log("Test - Followers:: Resolve");
+followers.resolve(Inhabitant.ruleSet, test_facts, {"L": test_facts.RS0_mainchar_000});
+console.log(followers);
 

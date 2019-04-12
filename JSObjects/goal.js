@@ -1,4 +1,4 @@
-/*global Inference*/
+/*global Inference, Inhabitant*/
 function Goal() {
     "use strict";
     this.priority = Goal.INITIAL_PRIORITY;
@@ -17,13 +17,14 @@ Goal.MAX_INTENTIONS_PER_ROUND = 2;
 Goal.DEFAULT_INTENTION_MIN_THRESHOLD = 0.5;
 Goal.FEEDBACK_THRESHOLD = 0.2;
 
-/*
-e.g. vent-out, get-privacy, drag-attention
 
+/*
+This method should be moved to Inhabitant
+
+e.g. vent-out, get-privacy, drag-attention
 facts = {
     "self": this
 }
-
 */
 Goal.createIntinct = function (path, intensity) {
     "use strict";
@@ -41,11 +42,7 @@ Goal.createIntinct = function (path, intensity) {
 };
 
 /*
-
-facts = {
-    "self": this,
-    "inhabitants": {inhabitant.id:inhabitant, ..}
-}
+This method should be moved to Inhabitant
 */
 Goal.createPathFollowers = function (people, path, rapport_level, path_level) {
     "use strict";
@@ -58,11 +55,17 @@ Goal.createPathFollowers = function (people, path, rapport_level, path_level) {
     goal.duration = -1;
     
     goal.achievedFunction = function (facts) {
-        var peopleCount = 0, inhabitantID, inhabitant;
+        var peopleCount = 0, inhabitantID, inhabitant, inhabitants = {};
+        for (inhabitantID in facts) {
+            if (facts.hasOwnProperty(inhabitantID) && facts[inhabitantID] instanceof Inhabitant) {
+                inhabitants[inhabitantID] = facts[inhabitantID];
+            }
+        }
+        
         if (facts.hasOwnProperty("self") && facts.self.hasOwnProperty("rapport")) {
             for (inhabitantID in facts.self.rapport) {
                 if (facts.self.rapport.hasOwnProperty(inhabitantID) && facts.self.rapport[inhabitantID] >= this.rapport_level) {
-                    inhabitant = facts.inhabitants[inhabitantID];
+                    inhabitant = inhabitants[inhabitantID];
                     if (inhabitant.pathLikehood[this.path] >= this.path_level) {
                         peopleCount += 1;
                     }

@@ -224,7 +224,13 @@ Inference.prototype.updateNeighbour = function (sample, feedback) {
 
 Inference.prototype.alignment = function () { // re-clustering, condensation and removing less relevant nodes 
     "use strict";
-    console.log("On Development... data condensation");
+    if (this.trainedSet.length >= Inference.POPULATION_MAX) {
+        console.log("On Development... data condensation");
+        while (this.trainedSet.length >= Inference.POPULATION_TARGET) {
+            this.trainedSet.shift();
+        }
+        this.standarizeFeatures();
+    }
 };
 
 
