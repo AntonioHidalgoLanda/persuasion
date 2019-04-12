@@ -198,8 +198,6 @@ Inference.prototype.findClosestNeighbour = function (sample) {
     nodes.sort(function (obj1, obj2) {
         return obj1.distance - obj2.distance;
     });
-    console.log("Verifying Sorting - Inference.prototype.findClosestNeighbour");
-    console.log(nodes);
     for (i = 0; i < Inference.K_NEIGHBOURGS && i < nodes.length; i += 1) {
         totaLength += nodes[i].distance;
     }

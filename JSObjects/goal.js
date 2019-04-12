@@ -30,8 +30,8 @@ Goal.createIntinct = function (path, intensity) {
     goal.intensity = intensity;
     goal.priority = -1;
     
-    goal.isAchievedFunction = function (facts) {
-        return facts.self.pathLikehood[this.path] >= this.intensity;
+    goal.achievedFunction = function (facts) {
+        return facts.self.pathLikehood[this.path] - this.intensity;
     };
     
     return goal;
@@ -54,7 +54,7 @@ Goal.createPathFollowers = function (people, path, rapport_level, path_level) {
     goal.path_level = path_level;
     goal.duration = -1;
     
-    goal.isAchievedFunction = function (facts) {
+    goal.achievedFunction = function (facts) {
         var peopleCount = 0, inhabitantID, inhabitant;
         if (facts.hasOwnProperty("self") && facts.self.hasOwnProperty("rapport")) {
             for (inhabitantID in facts.self.rapport) {
@@ -77,7 +77,7 @@ Goal.prototype.isAchieved = function (facts) {
     if (this.duration <= 0 && this.duration !== -1) {
         return true;
     }
-    return this.isAchievedFunction(facts);
+    return this.achievedFunction(facts) >= 0;
 };
 
 // Sub Goals or Intentions (actions)
@@ -140,14 +140,15 @@ Goal.prototype.executeIntentions = function () {
     var p = Math.random(), intention;
     console.log("On Development... reframe how to manage priorities (goal) and rattings (intention)");
     console.log("On Development... feedback to world model");
+    console.log("Check this.achievedFunction(facts) before runing the intentions and after running the intentions. If there is positive change, updateRatting with new ratting value.");
     // var doneSomething = false;
     for (var i = 0; i < this.intentions.length && i < Goal.MAX_INTENTIONS_PER_ROUND; i++) {
         intention = this.intentions[i];
         if (intention.ratting * this.priority > p) {
             intention.rule.execute({}, intention.candidate);
             // check results
-            // feedback = evaluateGoal (WM);
-            //this.inference.updateNeighbour(sample, feedback);
+            // feedback = achievedFunction (WM);
+            //this.inference.updateRatting(sample, feedback);
         }
     }
     // if (!doneSomething) {this.intentions[0].rule.execute(this.intentions[0].candidate)}
@@ -162,7 +163,7 @@ Goal.prototype.getRatting = function (rule, candidate) {
     
     Object.assign(sample, Inference.extractFeatures(rule, ":rule", Inference.FEATURE_EXTRACTION_UNLOOP_LEVEL));
     Object.assign(sample, Inference.extractFeatures(candidate));   // Avoid skiping inhabitants
-    this.inference.normalizeFeatures(sample);
+    this.inference.standarizeFeatures();
 
     return this.inference.findClosestNeighbour(sample);
 };

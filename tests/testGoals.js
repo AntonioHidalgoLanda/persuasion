@@ -74,9 +74,10 @@ console.log(instinct);
 
 console.log("Test - Instincts:: Base World Model");
 instinct.updateRatting(Inhabitant.ruleSet.persuade, candidates[0], feedback);
-instinct.updateRatting(Inhabitant.ruleSet.persuade, candidates[1], feedback);
+instinct.updateRatting(Inhabitant.ruleSet.persuade, candidates[1], feedback/2);
 
-console.log("Test - Instincts:: Wolrd Model - Standarized");
+console.log("Test - Instincts:: Get Ratting");
+console.log(instinct.getRatting(Inhabitant.ruleSet.persuade,candidates[2]));
 
 console.log("Test - Instincts:: Is Achived - true");
 console.log(instinct.isAchieved({"self": test_facts.RS0_mainchar_000}));
@@ -88,7 +89,7 @@ console.log(instinct.isAchieved({"self": test_facts.RS0_inhabitant_001}));
 
 console.log("Test - Instincts:: Resolve");
 console.log(Inhabitant.ruleSet.persuade.getCandidates(test_facts, {"T": test_facts.RS0_inhabitant_001}));
-instinct.resolve(Inhabitant.ruleSet, test_facts, {"L": test_facts.RS0_mainchar_000});
+//instinct.resolve(Inhabitant.ruleSet, test_facts, {"L": test_facts.RS0_mainchar_000});
 
 
 console.log("Test - creation of Goal - " + levelPath + " level on " + path + ", x" + people + "followers with " + levelRapport + "rapport.");
