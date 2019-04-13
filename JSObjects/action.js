@@ -61,16 +61,23 @@ Action.persuade.reaction += " T.increaseRapport(L.id, action.entretain);";
 
 /*Room work*/
 Action.work = {};
+
 Action.work.condition = "(L !== T) && " +
     " L.currentRoom === room && " +
     " T.currentRoom === room && " +
-    " L.isPathLevelGreater(room.pathEntry, room.pathEntryLevel)";
+//TODO:     " L.cash >= room.price && " +
+    " T.isPathLevelGreater(room.pathEntry, room.pathServiceLevel)";
+// L is the customer here.
 
 // Neg
 Action.work.reaction = " T.selfvalue[L.id] = (!T.selfvalue.hasOwnProperty(L.id))?" +
         "100:Math.max(0, T.selfvalue[L.id] - (action.neg * 0.5));" +
         " T.increaseRapport(L.id, (T.selfvalue[L.id] > 0)? action.neg : 0);";
-            
+
+// TODO: cost
+// Action.work.reaction += " T.cash += room.price; " +
+//    " L.cash -= room.price";
+
 // Illustrate
 Action.work.reaction += " T.increasePathLevel(room.pathEntry, action.illustrate);" +
         " L.increasePathLevel(room.pathEntry, action.illustrate * 0.1);";

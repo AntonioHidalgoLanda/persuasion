@@ -5,7 +5,9 @@ function Room(id) {
     this.entrance = {};
     this.inhabitants = {};
     this.pathEntry = "";
-    this.pathEntryLevel = 0;
+    this.pathEntryLevel = 0;    // enter consume
+    this.pathServiceLevel = 10;  // work inside
+    this.price = 10;  // work inside
 }
 
 Room.DREAMING_NEIGHBOURGS = 2.9;
