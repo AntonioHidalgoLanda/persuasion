@@ -68,7 +68,8 @@ console.log("Test Goals: Followers:: Is Achieved - true");
 console.log(followers.isAchieved(test_facts));
 
 console.log("Test Goals: Followers:: Base World Model");
-followers.updateRatting(Inhabitant.ruleSet.persuade, candidates[0], feedback);
+feedback = 0;
+followers.updateRatting(Inhabitant.ruleSet.persuade, {"L": test_facts.RS0_mainchar_000}, feedback);
 
 
 // note that only RS0_mainchar_000 can be L

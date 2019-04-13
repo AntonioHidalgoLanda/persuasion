@@ -26,8 +26,8 @@ and open the template in the editor.
         <script type="text/javascript" src="JSView/baseView.js"></script>
         <script type="text/javascript" src="JSView/mapView.js"></script>
         <!-- Tesitng -->
-        <!--<script type="text/javascript" src="tests/testActions.js"></script>-->
-        <!--<script type="text/javascript" src="tests/testGoals.js"></script>-->
+        <script type="text/javascript" src="tests/testActions.js"></script>
+        <script type="text/javascript" src="tests/testGoals.js"></script>
     </head>
     <body>
         <div id="gui-room-div">
@@ -85,7 +85,7 @@ and open the template in the editor.
         // Behaviours
         /*
         Every 10 seconds or anytime that butoon turn is hit
-        
+        // INITIALIZE
         var ruleset = {};
         Object.assign(ruleset, Room.ruleSet);
         Object.assign(ruleset, Inhabitant.ruleSet);
@@ -96,14 +96,14 @@ and open the template in the editor.
                 // create goals
                 test_facts[factid].goals.followers = new Goal();
                 
-                // update with random values - TODO: create function
-                test_facts[factid].goals.followers.updateRatting(Inhabitant.ruleSet.persuade, candidates[0], feedback);
-                test_facts[factid].goals.followers.updateRatting(Room.ruleSet.go, candidates[0], feedback);
-                test_facts[factid].goals.followers.updateRatting(Room.ruleSet.work, candidates[0], feedback);
+                test_facts[factid].goals.followers.updateRatting(Inhabitant.ruleSet.persuade, {"L": test_facts[factid]}, feedback);
+                test_facts[factid].goals.followers.updateRatting(Room.ruleSet.go, {"L": test_facts[factid]}, feedback);
+                test_facts[factid].goals.followers.updateRatting(Room.ruleSet.work, {"L": test_facts[factid]}, feedback);
             }
         }
         
         Every 10 seconds or anytime that butoon turn is hit
+        // TURN
         for (factid in test_facts) {
             if (test_facts.hasOwnProperty(factid) && test_facts[factid] instanceof Inhabitant) {
             

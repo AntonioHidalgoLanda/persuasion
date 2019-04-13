@@ -175,6 +175,8 @@ Goal.prototype.executeIntentions = function (facts) {
         if (Math.abs(achievedPre - achievedPost) >= Goal.FEEDBACK_THRESHOLD) {
             feedback = (achievedPre < achievedPost) ? achievedPost : -achievedPost;
             this.updateRatting(intention.rule, intention.candidate, feedback);
+        } else {
+            this.updateRatting(intention.rule, intention.candidate, -Goal.FEEDBACK_THRESHOLD);
         }
     }
 
@@ -204,7 +206,6 @@ Goal.prototype.updateRatting = function (rule, candidate, feedback) {
     Object.assign(sample, Inference.extractFeatures(rule, ":rule", Inference.FEATURE_EXTRACTION_UNLOOP_LEVEL));
     Object.assign(sample, Inference.extractFeatures(candidate));   // Avoid skiping inhabitants
     this.inference.updateNeighbour(sample, feedback);
-    this.inference.standarizeFeatures();
     this.inference.alignment(); // re-clustering, condensation and removing less relevant nodes
 
     return this;

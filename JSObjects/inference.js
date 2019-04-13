@@ -204,7 +204,11 @@ Inference.prototype.findClosestNeighbour = function (sample) {
         totaLength += nodes[i].distance;
     }
     for (i = 0; i < Inference.K_NEIGHBOURGS && i < nodes.length; i += 1) {
-        ratting += (1 - (nodes[i].distance / totaLength)) * nodes[i].ratting;
+        if (totaLength !== 0) {
+            ratting += (1 - (nodes[i].distance / totaLength)) * nodes[i].ratting;
+        } else {
+            ratting += nodes[i].ratting / Math.max(Inference.K_NEIGHBOURGS, nodes.length);
+        }
     }
     return ratting;
 };
@@ -225,10 +229,15 @@ Inference.prototype.updateNeighbour = function (sample, feedback) {
 Inference.prototype.alignment = function () { // re-clustering, condensation and removing less relevant nodes 
     "use strict";
     if (this.trainedSet.length >= Inference.POPULATION_MAX) {
+        
+        this.trainedSet.sort(function (obj1, obj2) {
+            return Math.abs(obj1.ratting - obj2.ratting);
+        });
+        
+        this.trainedSet.length = Inference.POPULATION_TARGET;
+        
         console.log("On Development... data condensation");
-        while (this.trainedSet.length >= Inference.POPULATION_TARGET) {
-            this.trainedSet.shift();
-        }
+        
         this.standarizeFeatures();
     }
 };
