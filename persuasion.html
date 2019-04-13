@@ -82,5 +82,42 @@ and open the template in the editor.
         viewRoom.setViewee(room);
         
         
+        // Behaviours
+        /*
+        Every 10 seconds or anytime that butoon turn is hit
+        
+        var ruleset = {};
+        Object.assign(ruleset, Room.ruleSet);
+        Object.assign(ruleset, Inhabitant.ruleSet);
+        for (factid in test_facts) {
+            if (test_facts.hasOwnProperty(factid) && test_facts[factid] instanceof Inhabitant) {
+                test_facts[factid].goals = {};
+                // random goal
+                // create goals
+                test_facts[factid].goals.followers = new Goal();
+                
+                // update with random values - TODO: create function
+                test_facts[factid].goals.followers.updateRatting(Inhabitant.ruleSet.persuade, candidates[0], feedback);
+                test_facts[factid].goals.followers.updateRatting(Room.ruleSet.go, candidates[0], feedback);
+                test_facts[factid].goals.followers.updateRatting(Room.ruleSet.work, candidates[0], feedback);
+            }
+        }
+        
+        Every 10 seconds or anytime that butoon turn is hit
+        for (factid in test_facts) {
+            if (test_facts.hasOwnProperty(factid) && test_facts[factid] instanceof Inhabitant) {
+            
+                // find all goals
+                
+                test_facts.self = test_facts[factid];
+                test_facts[factid].goals.followers.resolve(ruleset, test_facts, {"L": test_facts[factid]});
+                delete test_facts.self;
+
+            }
+        }
+        */
+        
+        
+        
     </script>
 </html>
