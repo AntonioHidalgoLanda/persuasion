@@ -5,6 +5,7 @@ function Inhabitant(id) {
     this.selfvalue = {};
     this.rapport = {};
     this.pathLikehood = {};
+    this.cash = 100;
     // TODO: intentions
         
     // Action discover (also persuade illustrate) may change World View

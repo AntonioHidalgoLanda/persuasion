@@ -65,7 +65,7 @@ Action.work = {};
 Action.work.condition = "(L !== T) && " +
     " L.currentRoom === room && " +
     " T.currentRoom === room && " +
-//TODO:     " L.cash >= room.price && " +
+    " L.cash > room.price && " +
     " T.isPathLevelGreater(room.pathEntry, room.pathServiceLevel)";
 // L is the customer here.
 
@@ -74,16 +74,16 @@ Action.work.reaction = " T.selfvalue[L.id] = (!T.selfvalue.hasOwnProperty(L.id))
         "100:Math.max(0, T.selfvalue[L.id] - (action.neg * 0.5));" +
         " T.increaseRapport(L.id, (T.selfvalue[L.id] > 0)? action.neg : 0);";
 
-// TODO: cost
-// Action.work.reaction += " T.cash += room.price; " +
-//    " L.cash -= room.price";
-
 // Illustrate
 Action.work.reaction += " T.increasePathLevel(room.pathEntry, action.illustrate);" +
         " L.increasePathLevel(room.pathEntry, action.illustrate * 0.1);";
 
 // Entretain
 Action.work.reaction += " T.increaseRapport(L.id, action.entretain);";
+
+// Cost
+Action.work.reaction += " T.cash += room.price; " +
+    " L.cash -= room.price";
 
 // TODO: Add a room multiplier to all the reactions.
 
