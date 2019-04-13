@@ -81,7 +81,7 @@ Inhabitant.prototype.increaseRapport = function (inhabitantId, increase, limit) 
 Inhabitant.convergentIncrement = function (x, limit) {
     "use strict";
     if (typeof limit !== "number") {
-        limit = 100;
+        limit = 1;
     }
     return limit + (1 / (x + 1));
 };

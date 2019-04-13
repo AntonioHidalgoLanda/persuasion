@@ -53,9 +53,15 @@ Room.prototype.setEntrance = function (room) {
 Room.prototype.getNeighbours = function (deep) {
     "use strict";
     var neighbours = [],
+        neighbour,
+        rooms,
+        roomNumber,
+        room,
+        newneighbour,
+        i,
         level = 0;
     neighbours[level] = [];
-    for (var neighbour in this.entrance) {
+    for (neighbour in this.entrance) {
         neighbours[level].push(this.entrance[neighbour]);
     }
     if (deep !== undefined) {
@@ -63,16 +69,16 @@ Room.prototype.getNeighbours = function (deep) {
             level++;
             neighbours[level] = [];
             for (neighbour in neighbours[level - 1]) {
-                var rooms = neighbours[level - 1][neighbour].getNeighbours();
-                for (var roomNumber in rooms[0]) {
-                    var room = rooms[0][roomNumber];
-                    var newneighbour = true;
-                    for (var i = 0; i < level; i++) {
+                rooms = neighbours[level - 1][neighbour].getNeighbours();
+                for (roomNumber in rooms[0]) {
+                    room = rooms[0][roomNumber];
+                    newneighbour = true;
+                    for (i = 0; i < level; i++) {
                         if (room in neighbours[level]) {
                             newneighbour = false;
                         }
                     }
-                    if (newneighbour){
+                    if (newneighbour) {
                         neighbours[level].push(room);
                     }
                 }
@@ -174,20 +180,3 @@ Room.prototype.getRules = function () {
     return Room.ruleSet;
 };
 
-Room.prototype.getCandidatesRuleLeadActions = function (rule, lead, actions) {
-    "use strict";
-    var candidates = [];
-console.log("TODO - Room.prototype.getCandidatesRuleLeadActions: Add loops to have convination Entrances X People X Actions");
-    for (var roomid in this.entrance) {
-        var destination = this.entrance[roomid];
-        var candidate = {
-            "L": lead,
-            "D": destination,
-            "Math": Math
-        };
-        if (rule.isValidCandidate(candidate)) {
-            candidates.push(candidate);
-        }
-    }
-    return candidates;
-};

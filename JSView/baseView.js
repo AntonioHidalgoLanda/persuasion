@@ -1,4 +1,4 @@
-/*global jQuery, Rule*/
+/*global jQuery, Inhabitant, Room*/
 /*global showMap*//*from JSView/mapView - we may create them as a class later*/
 function BaseView(divId, inhabitant, actions) {
     "use strict";
@@ -189,35 +189,53 @@ BaseView.prototype.refreshInhabitants = function () {
 BaseView.prototype.refreshRules = function () {
     "use strict";
     var divId = BaseView.DIV_ELEMENT_ID.RULES_DIV + "_" + this.divId,
+        facts = {"self": this.inhabitant},
         ruleSet = {},
-        candidates;
+        rule,
+        ruleName,
+        candidates
+        candidate = {
+            "L": this.inhabitant,
+        };
+    
     
     this.emptyDiv("rulesDiv", divId);
     
     if (this.viewee !== null) {
+        Object.assign(facts, this.actions);
+        if (this.inhabitant !== null && this.inhabitant.hasOwnProperty("currentRoom")) {
+            facts.currentRoom = this.inhabitant.currentRoom;
+            Object.assign(facts, facts.currentRoom.inhabitants);
+            Object.assign(facts, this.viewee.entrance);
+        }
+        
+        if (this.viewee instanceof Inhabitant && this.viewee !== this.inhabitant) {
+            candidate.T = this.viewee;
+        }
+        
         if (typeof this.viewee.getRules === "function") {
             ruleSet = this.viewee.getRules();
         } else if (this.viewee.hasOwnProperty("ruleSet")) {
             ruleSet = this.viewee.ruleSet;
         }
+        
+        for (ruleName in ruleSet) {
+            if (ruleSet.hasOwnProperty(ruleName)) {
+                rule = ruleSet[ruleName];
+                candidates = rule.getCandidates(facts, candidate);
+                for (var candidateIdx in candidates) {
+                    if (candidates.hasOwnProperty(candidateIdx)) {
+                        var candidate = candidates[candidateIdx];
+                        this.rulesDiv.append(jQuery('<button/>', {
+                            text: ruleName + " " + BaseView.candidateName(candidate),
+                            click: this.handerExecuteCandidate(candidate, rule)
+                        }));
+                    }
+                }
+            }
+        } 
     }
     
-    for (var ruleName in ruleSet) {
-        var rule = ruleSet[ruleName];
-        if (this.viewee !== null && typeof this.viewee.getCandidatesRuleLeadActions === "function") {
-            candidates = this.viewee.getCandidatesRuleLeadActions(rule, this.inhabitant, this.actions);
-        } else {
-            candidates = {};
-        }
-        
-        for (var n in candidates) {
-            var candidate = candidates[n];
-            this.rulesDiv.append(jQuery('<button/>', {
-                text: ruleName + " " + BaseView.candidateName(candidate),
-                click: this.handerExecuteCandidate(candidate, rule)
-            }));
-        }
-    }
     return this;
 };
 
@@ -229,6 +247,8 @@ BaseView.candidateName = function (candidate) {
             name += ", " + candidate[target].getName();
         } else if (candidate[target].hasOwnProperty("id")) {
             name += ", " + candidate[target].id;
+        } else if (candidate[target] !== Math) {
+            name += JSON.stringify(candidate[target]);
         }
     }
     return name;

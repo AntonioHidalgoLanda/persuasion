@@ -26,7 +26,7 @@ and open the template in the editor.
         <script type="text/javascript" src="JSView/baseView.js"></script>
         <script type="text/javascript" src="JSView/mapView.js"></script>
         <!-- Tesitng -->
-        <script type="text/javascript" src="tests/testActions.js"></script>
+        <!--<script type="text/javascript" src="tests/testActions.js"></script>-->
         <!--<script type="text/javascript" src="tests/testGoals.js"></script>-->
     </head>
     <body>
@@ -39,8 +39,8 @@ and open the template in the editor.
         // Entities
         var actions = {};
         var fact = {};
-        fact.PATH_true_love = {"pathName": "true_love"};
-        fact.PATH_investing_startup_X = {"pathName": "investing_startup_X"};
+        fact.PATH_true_love = {"pathName": "true_love", "id": "true_love"};
+        fact.PATH_investing_startup_X = {"pathName": "investing_startup_X", "id": "investing_startup_X"};
         
         fact.RS0_mainchar_000 = Inhabitant.createLeader();
         fact.RS0_mainchar_000.textName = "Me";
@@ -50,10 +50,16 @@ and open the template in the editor.
 
         fact.RS0_action_000B = new Action();
         actions.RS0_action_000B = fact.RS0_action_000B;
+        actions.RS0_action_000B.id = "proffesional";
         fact.RS0_action_000O = new Action(0);
         actions.RS0_action_000O = fact.RS0_action_000O;
+        actions.RS0_action_000O.id = "novice";
         fact.RS0_action_001O = new Action(0, 0);
         actions.RS0_action_001O = fact.RS0_action_001O;
+        actions.RS0_action_001O.id = "public";
+        actions.PATH_true_love = fact.PATH_true_love;
+        actions.PATH_investing_startup_X = fact.PATH_investing_startup_X;
+        
         
         
         fact.RS0_inhabitant_001.textName = "Unknown Person";
@@ -63,6 +69,7 @@ and open the template in the editor.
         room.textName = "Generic Room";
         room.dreamNeighbouhood();
         room.enterGroup(fact);
+        room.pathEntry = fact.PATH_investing_startup_X.pathName;
         //console.log("room");
         //console.log(room);
         
