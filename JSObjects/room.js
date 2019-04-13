@@ -164,8 +164,7 @@ Room.prototype.getD3SjonMap = function () {
 /* Rule Management*/
 Room.ruleSet = {};
 // Need to add Math somewhere, otherwise the recursiveDFSCandidate will fail
-//var condition = "D.pathEntryLevel === Math.mac(0,-1) || L.pathLikehood[D.pathEntry] >= D.pathEntryLevel";
-var condition = "D.pathEntryLevel === Math.max(0,-1) || L.pathLikehood[D.pathEntry] >= D.pathEntryLevel";
+var condition = "D.pathEntryLevel === 0 || L.pathLikehood[D.pathEntry] >= D.pathEntryLevel";
 var reaction = "D.enter(L)";
 Room.ruleSet.go = new Rule(condition, reaction);
 Room.ruleSet.work = new Rule(Action.work.condition, Action.work.reaction);
