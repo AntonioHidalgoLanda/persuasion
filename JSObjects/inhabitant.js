@@ -7,7 +7,6 @@ function Inhabitant(id) {
     this.pathLikehood = {};
     // TODO: intentions
         
-    // Actions (Persuade, Work) may change Goals
     // Action discover (also persuade illustrate) may change World View
     
     // TODO Leader should have energy but not necesarily time
@@ -59,42 +58,32 @@ Inhabitant.prototype.isRapportLevelGreater = function (inhabitantId, level) {
     return ((level <= 0) || (this.rapport.hasOwnProperty(inhabitantId) && this.rapport[inhabitantId] >= level));
 };
 
-Inhabitant.prototype.increasePathLevel = function (path, increase) {
+Inhabitant.prototype.increasePathLevel = function (path, increase, limit) {
     "use strict";
-    if (this.pathLikehood.hasOwnProperty(path)) {
-        this.pathLikehood[path] += increase;
-    } else {
-        this.pathLikehood[path] = increase;
+    if (!this.pathLikehood.hasOwnProperty(path)) {
+        this.pathLikehood[path] = 0;
     }
+    increase += this.pathLikehood[path];
+    this.pathLikehood[path] += Inhabitant.convergentIncrement(increase, limit);
     return this;
 };
 
-Inhabitant.prototype.increaseRapport = function (inhabitantId, increase) {
+Inhabitant.prototype.increaseRapport = function (inhabitantId, increase, limit) {
     "use strict";
-    if (this.rapport.hasOwnProperty(inhabitantId)) {
-        this.rapport[inhabitantId] += increase;
-    } else {
-        this.rapport[inhabitantId] = increase;
+    if (!this.rapport.hasOwnProperty(inhabitantId)) {
+        this.rapport[inhabitantId] = 0;
     }
+    increase += this.rapport[inhabitantId];
+    this.rapport[inhabitantId] += Inhabitant.convergentIncrement(increase, limit);
     return this;
 };
 
-Inhabitant.prototype.getCandidatesRuleLeadActions = function (rule, lead, actions) {
+Inhabitant.convergentIncrement = function (x, limit) {
     "use strict";
-    var candidates = [];
-    for (var actionName in actions) {
-        var action = actions[actionName];
-        var candidate = {
-            "action": action,
-            "L": lead,
-            "T": this,
-            "Math": Math
-        };
-        if (rule.isValidCandidate(candidate)) {
-            candidates.push(candidate);
-        }
+    if (typeof limit !== "number") {
+        limit = 100;
     }
-    return candidates;
+    return limit + (1 / (x + 1));
 };
 
 Inhabitant.ruleSet = {
@@ -106,8 +95,8 @@ Inhabitant.prototype.description = function () {
     'use strict';
     var seen = [];
     // return JSON.stringify(this); // Hack to resolve Inhabitant being a cyclic object
-    return JSON.stringify(this, function(key, val) {
-       if (val != null && typeof val == "object") {
+    return JSON.stringify(this, function (key, val) {
+        if (val !== null && typeof val === "object") {
             if (seen.indexOf(val) >= 0) {
                 return;
             }
@@ -116,4 +105,5 @@ Inhabitant.prototype.description = function () {
         return val;
     });
 };
+
 

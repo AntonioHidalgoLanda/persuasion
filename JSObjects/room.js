@@ -1,11 +1,9 @@
-/*global Rule, Inhabitant*/
+/*global Rule, Action, Inhabitant*/
 function Room(id) {
     "use strict";
     this.id = (id === undefined || id === null) ? "room_" + Math.floor(Math.random() * (1000 - 1)) : id;
     this.entrance = {};
-    this.works = {}; // actions
     this.inhabitants = {};
-//    this.pathentryLevel = {}; // to fileter who can access to the room with go to
     this.pathEntry = "";
     this.pathEntryLevel = 0;
 }
@@ -164,18 +162,13 @@ Room.prototype.getD3SjonMap = function () {
 };
 
 /* Rule Management*/
-/*
-Room.ruleSet = {
-    "go": new Rule(condition, reaction),    <inhabitant, room>
-    "work": new Rule(condition, reaction)   <inhabitant, room, action>  e.g. rest, manufacture
-    "work": new Rule(condition, reaction)   <inhabitant, inhabitant, room, action> e.g. customer_engagement
-};
-*/
 Room.ruleSet = {};
-var condition = "D.pathEntryLevel ===0 || L.pathLikehood[D.pathEntry] >= D.pathEntryLevel";
+// Need to add Math somewhere, otherwise the recursiveDFSCandidate will fail
+//var condition = "D.pathEntryLevel === Math.mac(0,-1) || L.pathLikehood[D.pathEntry] >= D.pathEntryLevel";
+var condition = "D.pathEntryLevel === Math.max(0,-1) || L.pathLikehood[D.pathEntry] >= D.pathEntryLevel";
 var reaction = "D.enter(L)";
 Room.ruleSet.go = new Rule(condition, reaction);
-//Room.ruleSet.work = new Rule(Action.work.condition, Action.work.reaction);
+Room.ruleSet.work = new Rule(Action.work.condition, Action.work.reaction);
 
 Room.prototype.getRules = function () {
     'use strict';

@@ -15,7 +15,7 @@ and open the template in the editor.
         <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
         <script src="http://d3js.org/d3.v2.min.js?2.9.3"></script>
         <!-- Core Components https://cdn.jsdelivr.net/gh/user/repo@master/file-->
-        <script type="text/javascript" src="https://cdn.jsdelivr.net/gh/AntonioHidalgoLanda/jssimpleruleengine@v1.5/JSObjects/rule.min.js"></script>
+        <script type="text/javascript" src="https://cdn.jsdelivr.net/gh/AntonioHidalgoLanda/jssimpleruleengine@v1.5/JSObjects/rule.js"></script>
         <!-- JS Objects -->
         <script type="text/javascript" src="JSObjects/action.js"></script>
         <script type="text/javascript" src="JSObjects/inhabitant.js"></script>
@@ -26,7 +26,8 @@ and open the template in the editor.
         <script type="text/javascript" src="JSView/baseView.js"></script>
         <script type="text/javascript" src="JSView/mapView.js"></script>
         <!-- Tesitng -->
-        <script type="text/javascript" src="tests/testGoals.js"></script>
+        <script type="text/javascript" src="tests/testActions.js"></script>
+        <!--<script type="text/javascript" src="tests/testGoals.js"></script>-->
     </head>
     <body>
         <div id="gui-room-div">
@@ -38,17 +39,20 @@ and open the template in the editor.
         // Entities
         var actions = {};
         var fact = {};
+        fact.PATH_true_love = {"pathName": "true_love"};
+        fact.PATH_investing_startup_X = {"pathName": "investing_startup_X"};
+        
         fact.RS0_mainchar_000 = Inhabitant.createLeader();
         fact.RS0_mainchar_000.textName = "Me";
 
         fact.RS0_inhabitant_000 = new Inhabitant();
         fact.RS0_inhabitant_001 = new Inhabitant();
 
-        fact.RS0_action_000B = new Action("followers");
+        fact.RS0_action_000B = new Action();
         actions.RS0_action_000B = fact.RS0_action_000B;
-        fact.RS0_action_000O = new Action("followers",0);
+        fact.RS0_action_000O = new Action(0);
         actions.RS0_action_000O = fact.RS0_action_000O;
-        fact.RS0_action_001O = new Action("followers", 0, 0);
+        fact.RS0_action_001O = new Action(0, 0);
         actions.RS0_action_001O = fact.RS0_action_001O;
         
         
