@@ -11,12 +11,10 @@ function Action(levelTrust, levelSkill, entretain, illustrate, neg) {
     this.entretain = (entretain === undefined || entretain === null) ? Math.floor(Math.random() * 10 + 1) : entretain;
     this.illustrate = (illustrate === undefined || illustrate === null) ? Math.floor(Math.random() * 10 + 1) : illustrate;
     this.neg = (neg === undefined || neg === null) ? Math.floor(Math.random() * 10 + 1) : neg;
-    
-    // Add room into equation
+
     // add Goals into equation - induce new goals
 }
-    
-Action.paths = ["power", "love", "money"];
+
 Action.ruleSet = {};
 
 /* Inhabitant Persuade*/

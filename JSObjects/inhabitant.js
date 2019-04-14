@@ -211,7 +211,7 @@ Inhabitant.prototype.executeTurn = function () {
     
     if (this.goals !== undefined && this.goals !== null) {
         
-        this.goal.sort(function (obj1, obj2) {
+        this.goals.sort(function (obj1, obj2) {
             if (obj1.priority === -1 && obj2.priority !== -1) {
                 return Number.MAX_SAFE_INTEGER;
             }

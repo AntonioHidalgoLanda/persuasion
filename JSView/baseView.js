@@ -256,7 +256,7 @@ BaseView.prototype.refreshTurnPanel = function () {
     if (this.turnPanelDiv !== null) {
         this.turnPanelDiv.append(jQuery('<button/>', {
             text: BaseView.BUTTON_TEXT.TURN,
-            click: this.executeTurn
+            click: this.handerExecuteTurn()
         }));
     }
     
@@ -289,12 +289,19 @@ BaseView.prototype.handerExecuteCandidate = function (candidate, rule) {
     };
 };
 
-
 BaseView.prototype.handerChangeViewee = function (newviewee) {
     "use strict";
     var that = this;
     return function () {
         that.setViewee(newviewee);
+    };
+};
+
+BaseView.prototype.handerExecuteTurn = function () {
+    "use strict";
+    var that = this;
+    return function () {
+        that.executeTurn();
     };
 };
 
