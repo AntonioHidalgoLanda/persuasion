@@ -34,7 +34,8 @@ Action.persuade.reaction += " T.increasePathLevel(path.pathName, action.illustra
         " L.increasePathLevel(path.pathName, action.illustrate * 0.1);";
 
 // Entretain
-Action.persuade.reaction += " T.increaseRapport(L.id, action.entretain);";
+Action.persuade.reaction += " T.increaseRapport(L.id, action.entretain);" +
+    " L.increaseRapport(T.id, action.entretain * 0.2);";
 
 
 
@@ -51,14 +52,15 @@ Action.work.condition = "(L !== T) && " +
 // Neg
 Action.work.reaction = " T.selfvalue[L.id] = (!T.selfvalue.hasOwnProperty(L.id))?" +
         "100:Math.max(0, T.selfvalue[L.id] - (action.neg * 0.5));" +
-        " T.increaseRapport(L.id, (T.selfvalue[L.id] > 0)? action.neg : 0);";
+        " T.increaseRapport(L.id, (T.selfvalue[L.id] > 0) ? action.neg : 0);";
 
 // Illustrate
 Action.work.reaction += " T.increasePathLevel(room.pathEntry, action.illustrate);" +
         " L.increasePathLevel(room.pathEntry, action.illustrate * 0.1);";
 
 // Entretain
-Action.work.reaction += " T.increaseRapport(L.id, action.entretain);";
+Action.work.reaction += " T.increaseRapport(L.id, action.entretain);" +
+    " L.increaseRapport(T.id, action.entretain * 0.2);";
 
 // Cost
 Action.work.reaction += " T.cash += room.price; " +
