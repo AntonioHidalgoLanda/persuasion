@@ -70,8 +70,8 @@ BaseView.prototype.emptyDiv = function (div, divId) {
         
     if (this[div] === null) {
         this[div] = jQuery('<div/>', {
-            id: divId,
-            class: BaseView.HTML_CLASS.MAIN
+            'id': divId,
+            'class': BaseView.HTML_CLASS.MAIN
         });
         
         this.mainDiv.append(this[div]);
@@ -125,8 +125,8 @@ BaseView.prototype.refreshPicture = function () {
         
     if (this.picDiv === null) {
         this.picDiv = jQuery('<img/>', {
-            id: divId,
-            class: BaseView.HTML_CLASS.MAIN
+            'id': divId,
+            'class': BaseView.HTML_CLASS.MAIN
         });
         
         this.mainDiv.append(this.picDiv);

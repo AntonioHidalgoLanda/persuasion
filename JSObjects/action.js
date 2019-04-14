@@ -1,11 +1,9 @@
-/*global Rule*/
 // levelTrust = ,      // raport of T to L;                 - 0 for open actions
 // levelSkill = ,      // skill required level of L or T;   - 0 for first actions
 
-function Action(levelTrust, levelSkill, cost, entretain, illustrate, neg) {
+function Action(levelTrust, levelSkill, entretain, illustrate, neg) {
     "use strict";
     
-    this.cost = (cost === undefined || cost === null) ? Math.floor(Math.random() * 20 + 1) : cost;
     this.levelTrust = (levelTrust === undefined || levelTrust === null) ? Math.floor(Math.random() * (5 + 1)) : levelTrust;
 
     this.levelSkill = (levelSkill === undefined || levelSkill === null) ? Math.floor(Math.random() * (10 + 1)) : levelSkill;
@@ -21,32 +19,15 @@ function Action(levelTrust, levelSkill, cost, entretain, illustrate, neg) {
 Action.paths = ["power", "love", "money"];
 Action.ruleSet = {};
 
-var condition = "L.time >= 0";
-var reaction = "L.time += 1";
-Action.ruleSet.timeEventRule = new Rule(condition, reaction);
-
-condition = "L.energy >= 1";
-reaction = "L.time ++; L.cash += 100; L.energy --;";
-Action.ruleSet.workRule = new Rule(condition, reaction);
-
-condition = "L.energy <= 90";
-reaction = "L.time += 10; L.energy = 100;";
-Action.ruleSet.sleepRule = new Rule(condition, reaction);
-
-
 /* Inhabitant Persuade*/
 Action.persuade = {};
-Action.persuade.condition = "(L !== T) && (L.energy >= action.cost) && " +
+Action.persuade.condition = "(L !== T) && " +
     " T.isRapportLevelGreater(L.id, action.levelTrust)" +
     " && (T.isPathLevelGreater(path.pathName, action.levelSkill)" +
     " || L.isPathLevelGreater(path.pathName, action.levelSkill))";
-
-// Common
-Action.persuade.reaction = "L.energy -= action.cost;" +
-        " L.time += 1;";
         
 // Neg
-Action.persuade.reaction += " T.selfvalue[L.id] = (!T.selfvalue.hasOwnProperty(L.id))?" +
+Action.persuade.reaction = " T.selfvalue[L.id] = (!T.selfvalue.hasOwnProperty(L.id))?" +
         "100:Math.max(0, T.selfvalue[L.id] - (action.neg * 0.5));" +
         " T.increaseRapport(L.id, (T.selfvalue[L.id] > 0)? action.neg : 0);";
             

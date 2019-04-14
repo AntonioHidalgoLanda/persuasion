@@ -40,8 +40,6 @@ Inhabitant.createLeader = function (id, time, energy, cash) {
     if (cash === undefined) {
         cash = 100;
     }
-    inhabitant.time = time;
-    inhabitant.energy = energy;
     inhabitant.cash = cash;
     
     return inhabitant;

@@ -17,6 +17,13 @@ var path = "social_cause",
     candidates_work,
     candidates_goto;
 
+
+
+console.log("Rule Targets:");
+console.log(Inhabitant.ruleSet.persuade.extractTargets());
+console.log(Room.ruleSet.work.extractTargets());
+console.log(Room.ruleSet.go.extractTargets());
+
 console.log("Facts (Rooms, Inhabitants, Global Actions)");
 test_facts.RS0_mainchar_000 = Inhabitant.createLeader();
 test_facts.RS0_mainchar_000.textName = "Me";
@@ -96,6 +103,7 @@ for (factid in test_facts) {
     }
 }
 console.log(candidates_main);
+
 
 // Test Goto
 
