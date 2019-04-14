@@ -59,32 +59,46 @@ Inhabitant.prototype.isRapportLevelGreater = function (inhabitantId, level) {
     return ((level <= 0) || (this.rapport.hasOwnProperty(inhabitantId) && this.rapport[inhabitantId] >= level));
 };
 
-Inhabitant.prototype.increasePathLevel = function (path, increase, limit) {
+Inhabitant.prototype.increasePathLevel = function (path, increase, limit, slope) {
     "use strict";
+    var increment = increase;
     if (!this.pathLikehood.hasOwnProperty(path)) {
         this.pathLikehood[path] = 0;
     }
     increase += this.pathLikehood[path];
-    this.pathLikehood[path] += Inhabitant.convergentIncrement(increase, limit);
+    this.pathLikehood[path] += Inhabitant.convergentIncrement(increase, limit, increment, slope);
     return this;
 };
 
-Inhabitant.prototype.increaseRapport = function (inhabitantId, increase, limit) {
+Inhabitant.prototype.increaseRapport = function (inhabitantId, increase, limit, slope) {
     "use strict";
+    var increment = increase;
     if (!this.rapport.hasOwnProperty(inhabitantId)) {
         this.rapport[inhabitantId] = 0;
     }
     increase += this.rapport[inhabitantId];
-    this.rapport[inhabitantId] += Inhabitant.convergentIncrement(increase, limit);
+    this.rapport[inhabitantId] += Inhabitant.convergentIncrement(increase, limit, increment, slope);
     return this;
 };
-
-Inhabitant.convergentIncrement = function (x, limit) {
+/*
+We are using the following sigmoid:
+slope : .3
+from https://www.wolframalpha.com
+plot  (1 - (x-100)/(40 + abs(x-100)))/2  from 0 to 200
+(1 - (x-(maxValue/2))/(((maxValue/2)*slope) + abs(x-(maxValue/2))))/2 * TopIncrement
+*/
+Inhabitant.convergentIncrement = function (x, limit, topIncrement, slope) {
     "use strict";
     if (typeof limit !== "number") {
-        limit = 1;
+        limit = 100;
     }
-    return limit + (1 / (x + 1));
+    if (typeof topIncrement !== "number") {
+        topIncrement = 1;
+    }
+    if (typeof slope !== "number") {
+        slope = 0.3;
+    }
+    return (1 - (x - (limit / 2)) / (((limit / 2) * slope) + Math.abs(x - (limit / 2)))) / 2 * topIncrement;
 };
 
 Inhabitant.ruleSet = {
