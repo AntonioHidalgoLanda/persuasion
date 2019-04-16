@@ -1,4 +1,4 @@
-/*global jQuery, Inhabitant*/
+/*global jQuery, Inhabitant, Image*/
 /*global showMap*//*from JSView/mapView - we may create them as a class later*/
 function BaseView(divId, inhabitant, actions) {
     "use strict";
@@ -28,6 +28,9 @@ BaseView.DIV_ELEMENT_ID = {
     "RULES_DIV": "persuasion_base_rules",
     "TURN_PANEL_DIV": "persuasion_turn_panel"
 };
+
+BaseView.IMAGE_ROOT = "img/";
+BaseView.IMAGE_MAX_LEVEL = 100;
 
 BaseView.BUTTON_TEXT = {"TURN": "turn"};
 
@@ -324,4 +327,103 @@ BaseView.prototype.executeTurn = function () {
     }
     this.refresh();
     return this;
+};
+
+BaseView.prototype.getAllPaths = function () {
+    "use strict";
+    var actionIdx,
+        paths = [];
+    if (this.actions !== undefined) {
+        for (actionIdx in this.actions) {
+            if (this.actions.hasOwnProperty(actionIdx) && this.actions[actionIdx].hasOwnProperty("pathName")) {
+                paths.push(this.actions[actionIdx].pathName);
+            }
+        }
+    }
+    return paths;
+};
+
+BaseView.maxBelowThredshold = function (values, thredshold) {
+    "use strict";
+    var i, max = Number.MIN_SAFE_INTEGER;
+    for (i = 0; i < values.length; i += 1) {
+        if (values[i] > max && values[i] <= thredshold) {
+            max = values[i];
+        }
+    }
+    return max;
+};
+
+var addProfileIfImageExist = function (profileStructure, profile, path, level, src) {
+    "use strict";
+    return function () {
+        if (!profileStructure.hasOwnProperty(profile)) {
+            profileStructure[profile] = {path: {}};
+        }
+        if (!profileStructure[profile].hasOwnProperty(path)) {
+            profileStructure[profile][path] = {};
+        }
+        profileStructure[profile][path][level] = src;
+    };
+};
+
+BaseView.prototype.buildProfileStructure = function (profile) {
+    "use strict";
+    var level,
+        paths = this.getAllPaths(),
+        i,
+        path,
+        imageSrc,
+        img;
+    
+    if (this.profileStructure === undefined) {
+        this.profileStructure = {};
+    }
+    if (this.profileStructure[profile] === undefined) {
+        this.profileStructure[profile] = {};
+    }
+    
+    for (level = 0; level < BaseView.IMAGE_MAX_LEVEL; level += 1) {
+        imageSrc = BaseView.IMAGE_ROOT + profile + "/base-" + level + ".png";
+        /* IMAGE Exists */
+        img = new Image();
+        img.onload = addProfileIfImageExist(this.profileStructure, profile, "base", level, imageSrc);
+        img.src = imageSrc;
+    }
+    
+    for (i = 0; i < paths.length; i += 1) {
+        for (level = 0; level < BaseView.IMAGE_MAX_LEVEL; level += 1) {
+            path = paths[i];
+            imageSrc = BaseView.IMAGE_ROOT + profile + "/" + path + "-" + level + ".png";
+            /* IMAGE Exists */
+            img = new Image();
+            img.onload = addProfileIfImageExist(this.profileStructure, profile, path, level, imageSrc);
+            img.src = imageSrc;
+        }
+    }
+    
+    return this.profileStructure;
+};
+
+BaseView.prototype.getImageFromProfile = function (profile, path, level) {
+    "use strict";
+    var maxBase,
+        maxPath;
+    
+    if (this.profileStructure !== undefined) {
+        if (this.profileStructure.base !== undefined) {
+            maxBase = BaseView.maxBelowThredshold(Object.keys(this.profileStructure.base), level);
+        }
+        if (this.profileStructure.hasOwnProperty(path)) {
+            maxPath = BaseView.maxBelowThredshold(Object.keys(this.profileStructure[path]), level);
+        }
+        if (maxBase === Number.MIN_SAFE_INTEGER && maxPath === Number.MIN_SAFE_INTEGER) {
+            return "";
+        } else if (maxPath >= maxBase) {
+            return this.profileStructure[path][maxPath];
+        } else {
+            return this.profileStructure.base[maxBase];
+        }
+    }
+    return "";
 };

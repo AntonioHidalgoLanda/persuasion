@@ -51,3 +51,8 @@ room.pathEntry = fact.PATH_investing_startup_X.pathName;
 viewBase = new BaseView("gui-room-div", fact.RS0_mainchar_000, actions);
 viewBase.autonomi = autonomi;
 viewBase.setViewee(room);
+      
+var profiles;
+viewBase.buildProfileStructure("profile001");
+profiles = viewBase.buildProfileStructure("profile002");
+console.log(profiles);
