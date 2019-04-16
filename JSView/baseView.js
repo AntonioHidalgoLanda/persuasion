@@ -118,9 +118,30 @@ BaseView.prototype.refreshHeader = function () {
 BaseView.prototype.refreshPicture = function () {
     "use strict";
     var divId = BaseView.DIV_ELEMENT_ID.PIC_DIV + "_" + this.divId,
-        imageUri = "";
+        imageUri = "",
+        path = "",
+        level = 0,
+        sortedPath,
+        list;
     if (this.viewee !== null) {
-        if (typeof this.viewee.getImageUri === "function") {
+        if (this.viewee.hasOwnProperty("profile")) {
+            if (this.viewee.pathLikehood !== undefined) {
+                list = this.viewee.pathLikehood;
+                sortedPath = Object.keys(list).sort(function (obj1, obj2) {
+                    return list[obj2] - list[obj1];
+                });
+                if (sortedPath.length > 0) {
+                    path = sortedPath[0];
+                    level = list[path];
+                }
+            } else if (this.viewee.pathEntry !== undefined) {
+                path = this.viewee.pathEntry;
+                if (this.inhabitant.pathLikehood.hasOwnProperty(path)) {
+                    level = this.inhabitant.pathLikehood[path];
+                }
+            }
+            imageUri = this.getImageFromProfile(this.viewee.profile, path, level);
+        } else if (typeof this.viewee.getImageUri === "function") {
             imageUri = this.viewee.getImageUri();
         } else if (this.viewee.hasOwnProperty("imageUri")) {
             imageUri = this.viewee.imageUri;
@@ -410,19 +431,19 @@ BaseView.prototype.getImageFromProfile = function (profile, path, level) {
     var maxBase,
         maxPath;
     
-    if (this.profileStructure !== undefined) {
-        if (this.profileStructure.base !== undefined) {
-            maxBase = BaseView.maxBelowThredshold(Object.keys(this.profileStructure.base), level);
+    if (this.profileStructure !== undefined && this.profileStructure[profile] !== undefined) {
+        if (this.profileStructure[profile].base !== undefined) {
+            maxBase = BaseView.maxBelowThredshold(Object.keys(this.profileStructure[profile].base), level);
         }
-        if (this.profileStructure.hasOwnProperty(path)) {
-            maxPath = BaseView.maxBelowThredshold(Object.keys(this.profileStructure[path]), level);
+        if (this.profileStructure[profile].hasOwnProperty(path)) {
+            maxPath = BaseView.maxBelowThredshold(Object.keys(this.profileStructure[profile][path]), level);
         }
         if (maxBase === Number.MIN_SAFE_INTEGER && maxPath === Number.MIN_SAFE_INTEGER) {
             return "";
         } else if (maxPath >= maxBase) {
-            return this.profileStructure[path][maxPath];
+            return this.profileStructure[profile][path][maxPath];
         } else {
-            return this.profileStructure.base[maxBase];
+            return this.profileStructure[profile].base[maxBase];
         }
     }
     return "";
